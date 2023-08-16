@@ -10,6 +10,7 @@ struct mydata
     int complete;
     int port[N-1];
     char* ips[N-1];
+    int broadcasted[L];
 };
 
 void *controller(void *args)

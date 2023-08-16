@@ -15,6 +15,7 @@ struct mydata
 	int complete;
 	int port[N - 1];
 	char *ips[N - 1];
+	int broadcasted[L];
 };
 struct updated
 {
@@ -30,6 +31,8 @@ void *updating(void *args)
 	char *ack = "ack";
 	int sock = updating->socket;
 	char *buff = updating->buffer;
+    char sizeforbuf[2048];
+    buff = sizeforbuf;
 	while (updating->neededdata.complete == 0)
 	{
 		int valread = read(sock, buff, 2048);
