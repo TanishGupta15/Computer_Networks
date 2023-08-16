@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <bits/stdc++.h>
 #include "constants.h"
-#define PORT 9801
 using namespace std;
 
 struct mydata

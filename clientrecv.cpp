@@ -6,7 +6,6 @@
 #include <bits/stdc++.h>
 #include "constants.h"
 #include <pthread.h>
-#define PORT 9801
 using namespace std;
 
 struct mydata
@@ -21,33 +20,38 @@ struct updated
 {
 	struct mydata neededdata;
 	int socket;
-	char* buffer;
+	char *buffer;
 };
 
-void *updating(void* args){
+void *updating(void *args)
+{
 	string reading;
-	struct updated* updating = (struct updated*)args;
-	char* ack = "ack";
+	struct updated *updating = (struct updated *)args;
+	char *ack = "ack";
 	int sock = updating->socket;
-	char* buff = updating->buffer;
-	while(updating->neededdata.complete==0){
+	char *buff = updating->buffer;
+	while (updating->neededdata.complete == 0)
+	{
 		int valread = read(sock, buff, 2048);
 		reading = buff;
-		if(reading!=""){
+		if (reading != "")
+		{
 			int res = 0;
 			int i = 0;
-			while(reading[i]!='\n'){
-				res = res*10 + (reading[i]-'0');
+			while (reading[i] != '\n')
+			{
+				res = res * 10 + (reading[i] - '0');
 				i++;
 			}
 			i++;
 			string resdata;
-			for(int j = i; j < reading.length()-1; j++){
-				resdata+=reading[j];
+			for (int j = i; j < reading.length() - 1; j++)
+			{
+				resdata += reading[j];
 			}
 			updating->neededdata.checkpoints[res] = 1;
 			updating->neededdata.data[res] = resdata;
-			send(updating->socket,ack,strlen(ack),0);
+			send(updating->socket, ack, strlen(ack), 0);
 		}
 	}
 	int a = 2;
@@ -95,26 +99,37 @@ void *clientrecv(void *args)
 
 	for (int i = 0; i < N - 1; i++)
 	{
-		if ((status = connect(receivers[i], (struct sockaddr *)&serv_addrs[i],
-							  sizeof(serv_addrs[i]))) < 0)
+		while (1)
 		{
-			printf("\nConnection Failed \n");
-			int a = 2;
-			int *b = &a;
-			void *c = (void *)b;
-			return c;
+			if ((status = connect(receivers[i], (struct sockaddr *)&serv_addrs[i],
+								  sizeof(serv_addrs[i]))) < 0)
+			{
+				printf("\nConnection Failed \n");
+				continue;
+				int a = 2;
+				int *b = &a;
+				void *c = (void *)b;
+				return c;
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 
-	vector<pthread_t> updaters(N-1);
-	vector<struct updated> arguments(N-1);
-	for(int i = 0; i < N-1; i++){
+	vector<pthread_t> updaters(N - 1);
+	vector<struct updated> arguments(N - 1);
+	for (int i = 0; i < N - 1; i++)
+	{
 		arguments[i].socket = receivers[i];
 		arguments[i].buffer = buffers[i];
-		pthread_create(&updaters[i],NULL,updating,&arguments[i]);
+		arguments[i].neededdata = *needdata;
+		pthread_create(&updaters[i], NULL, updating, &arguments[i]);
 	}
-	for(int i = 0; i < N-1; i++){
-		pthread_join(updaters[i],NULL);
+	for (int i = 0; i < N - 1; i++)
+	{
+		pthread_join(updaters[i], NULL);
 	}
 
 	int a = 2;

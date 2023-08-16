@@ -29,13 +29,13 @@ void* client(void* arg)
     }
     args->complete = 0;
     pthread_create(&clientburster, NULL, clientburst, &args);
-    // pthread_create(&clientrecver, NULL, clientrecv, &args);
-    // pthread_create(&clientbroadcaster, NULL, clientbroadcast, &args);
+    pthread_create(&clientrecver, NULL, clientrecv, &args);
+    pthread_create(&clientbroadcaster, NULL, clientbroadcast, &args);
     pthread_create(&clientcontroller, NULL, controller, &args);
 
     pthread_join(clientburster, NULL);
-    // pthread_join(clientrecver,NULL);
-    // pthread_join(clientbroadcaster, NULL);
+    pthread_join(clientrecver,NULL);
+    pthread_join(clientbroadcaster, NULL);
     pthread_join(clientcontroller, NULL);
 
     printf("\nCompleted File transfer\n");
