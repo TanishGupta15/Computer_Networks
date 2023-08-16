@@ -4,13 +4,17 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <bits/stdc++.h>
+#include "constants.h"
 #define PORT 9801
 using namespace std;
+
 struct mydata
 {
-	int checkpoints[1000];
-	string data[1000];
-	int complete;
+    int checkpoints[L];
+    string data[L];
+    int complete;
+    int port[N-1];
+    char* ips[N-1];
 };
 
 void *clientburst(void *args)
@@ -70,7 +74,7 @@ void *clientburst(void *args)
 			i++;
 		}
 		printf("%d Complete value", needdata->complete);
-		if (res >= 1 && res <= 1000)
+		if (res >= 1 && res <= L)
 		{
 			printf("%d Number filled\n", res);
 			needdata->checkpoints[res - 1] = 1;

@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include <string.h>
+#include <bits/stdc++.h>
+#include "constants.h"
+using namespace std;
 struct mydata
 {
-    int checkpoints[1000];
-    char *data[1000];
+    int checkpoints[L];
+    string data[L];
     int complete;
+    int port[N-1];
+    char* ips[N-1];
 };
 
 void *controller(void *args)
@@ -14,7 +19,7 @@ void *controller(void *args)
     {
         // printf("here\n");
         int chk = 0;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < L; i++)
         {
             if (mydat->checkpoints[i] == 0)
             {

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <bits/stdc++.h>
+#include "constants.h"
 using namespace std;
 extern void *clientburst(void *args);
 extern void *clientrecv(void *args);
@@ -10,21 +11,24 @@ extern void *clientbroadcast(void *args);
 
 struct mydata
 {
-    int checkpoints[1000];
-    string data[1000];
+    int checkpoints[L];
+    string data[L];
     int complete;
+    int port[N-1];
+    char* ips[N-1];
 };
 
-void client(int checkpoints[], string data[])
+void* client(void* arg)
 {
+    struct mydata* args = (struct mydata*)arg;
     pthread_t clientburster, clientrecver, clientcontroller, clientbroadcaster;
     struct mydata args;
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < L; i++)
     {
-        args.checkpoints[i] = 0;
-        args.data[i] = "0";
+        args->checkpoints[i] = 0;
+        args->data[i] = "0";
     }
-    args.complete = 0;
+    args->complete = 0;
     pthread_create(&clientburster, NULL, clientburst, &args);
     // pthread_create(&clientrecver, NULL, clientrecv, &args);
     // pthread_create(&clientbroadcaster, NULL, clientbroadcast, &args);
@@ -37,13 +41,10 @@ void client(int checkpoints[], string data[])
 
     printf("\nCompleted File transfer\n");
 
-    return;
+	int a = 2;
+	int *b = &a;
+	void *c = (void *)b;
+	return c;
 }
 
-int main()
-{
-    int checkpoints[1000] = {0};
-    string data[1000] = {"0"};
-    client(checkpoints, data);
-    return 0;
-}
+
