@@ -27,12 +27,28 @@ struct updated
 void *updating(void* args){
 	string reading;
 	struct updated* updating = (struct updated*)args;
+	char* ack = "ack";
 	int sock = updating->socket;
 	char* buff = updating->buffer;
 	while(updating->neededdata.complete==0){
 		int valread = read(sock, buff, 2048);
-		reading += buff;
-		// Update data
+		reading = buff;
+		if(reading!=""){
+			int res = 0;
+			int i = 0;
+			while(reading[i]!='\n'){
+				res = res*10 + (reading[i]-'0');
+				i++;
+			}
+			i++;
+			string resdata;
+			for(int j = i; j < reading.length()-1; j++){
+				resdata+=reading[j];
+			}
+			updating->neededdata.checkpoints[res] = 1;
+			updating->neededdata.data[res] = resdata;
+			send(updating->socket,ack,strlen(ack),0);
+		}
 	}
 	int a = 2;
 	int *b = &a;

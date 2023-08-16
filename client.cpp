@@ -22,7 +22,6 @@ void* client(void* arg)
 {
     struct mydata* args = (struct mydata*)arg;
     pthread_t clientburster, clientrecver, clientcontroller, clientbroadcaster;
-    struct mydata args;
     for (int i = 0; i < L; i++)
     {
         args->checkpoints[i] = 0;
@@ -46,5 +45,9 @@ void* client(void* arg)
 	void *c = (void *)b;
 	return c;
 }
+
+// int main(){
+//     return 0;
+// }
 
 
