@@ -13,7 +13,7 @@ struct mydata
     string data[L];
     int complete;
     int port[N - 1];
-    char *ips[N - 1];
+    const char *ips[N - 1];
     int broadcasted[L];
 };
 struct updated
@@ -66,7 +66,7 @@ void* updating(void* args){
 
 }
 
-void *cleintbroadcast(void *args)
+void *clientbroadcast(void *args)
 {
     struct mydata *needdata = (struct mydata *)args;
     vector<int> listensockets(N - 1);

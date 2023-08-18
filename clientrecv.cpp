@@ -14,7 +14,7 @@ struct mydata
 	string data[L];
 	int complete;
 	int port[N - 1];
-	char *ips[N - 1];
+	const char *ips[N - 1];
 	int broadcasted[L];
 };
 struct updated
@@ -24,11 +24,12 @@ struct updated
 	char *buffer;
 };
 
-void *updating(void *args)
+void *updatin(void *args)
 {
 	string reading;
 	struct updated *updating = (struct updated *)args;
-	char *ack = "ack";
+	string temp1 = "ack";
+	const char *ack = temp1.c_str();
 	int sock = updating->socket;
 	char *buff = updating->buffer;
     char sizeforbuf[2048];
@@ -128,7 +129,7 @@ void *clientrecv(void *args)
 		arguments[i].socket = receivers[i];
 		arguments[i].buffer = buffers[i];
 		arguments[i].neededdata = *needdata;
-		pthread_create(&updaters[i], NULL, updating, &arguments[i]);
+		pthread_create(&updaters[i], NULL, updatin, &arguments[i]);
 	}
 	for (int i = 0; i < N - 1; i++)
 	{

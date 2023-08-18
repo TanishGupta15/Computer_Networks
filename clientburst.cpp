@@ -13,7 +13,7 @@ struct mydata
     string data[L];
     int complete;
     int port[N-1];
-    char* ips[N-1];
+    const char* ips[N-1];
 	int broadcasted[L];
 };
 
