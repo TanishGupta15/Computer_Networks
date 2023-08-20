@@ -4,10 +4,10 @@
 #include <bits/stdc++.h>
 #include "constants.h"
 using namespace std;
-extern void *clientburst(void *args);
-extern void *clientrecv(void *args);
-extern void *controller(void *args);
-extern void *clientbroadcast(void *args);
+extern void* clientburst(void *args);
+extern void* clientrecv(void *args);
+extern void* controller(void *args);
+extern void* clientbroadcast(void *args);
 
 struct mydata
 {
@@ -21,18 +21,21 @@ struct mydata
 
 void* client(void* arg)
 {
-    struct mydata* args = (struct mydata*)arg;
+    struct mydata* args = (struct mydata*) arg;
     pthread_t clientburster, clientrecver, clientcontroller, clientbroadcaster;
     for (int i = 0; i < L; i++)
     {
         args->checkpoints[i] = 0;
         args->data[i] = "0";
+        args->broadcasted[i] = 0;
+
     }
     args->complete = 0;
-    pthread_create(&clientburster, NULL, clientburst, &args);
-    pthread_create(&clientrecver, NULL, clientrecv, &args);
-    pthread_create(&clientbroadcaster, NULL, clientbroadcast, &args);
-    pthread_create(&clientcontroller, NULL, controller, &args);
+
+    pthread_create(&clientburster, NULL, clientburst, (void*) &(*args));
+    pthread_create(&clientrecver, NULL, clientrecv, (void*) &(*args));
+    pthread_create(&clientbroadcaster, NULL, clientbroadcast, (void*) &(*args));
+    pthread_create(&clientcontroller, NULL, controller, (void*) &(*args));
 
     pthread_join(clientburster, NULL);
     pthread_join(clientrecver,NULL);
@@ -46,9 +49,3 @@ void* client(void* arg)
 	void *c = (void *)b;
 	return c;
 }
-
-// int main(){
-//     return 0;
-// }
-
-

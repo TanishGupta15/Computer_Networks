@@ -15,10 +15,9 @@ struct mydata
 
 void *controller(void *args)
 {
-    struct mydata *mydat = (struct mydata *)args;
+    struct mydata* mydat = (struct mydata*) args;
     while (mydat->complete == 0)
     {
-        // printf("here\n");
         int chk = 0;
         for (int i = 0; i < L; i++)
         {

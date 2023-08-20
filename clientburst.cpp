@@ -23,6 +23,7 @@ void *clientburst(void *args)
 	int status, valread, client_fd;
 	struct sockaddr_in serv_addr;
 	const char *hello = "SENDLINE\n";
+
 	char buffer[1024] = {0};
 	if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
@@ -56,16 +57,13 @@ void *clientburst(void *args)
 
 	while (needdata->complete == 0)
 	{
-		// printf("loop2\n");
 		send(client_fd, hello, strlen(hello), 0);
 		valread = read(client_fd, buffer, 2048);
 		string mystring = buffer;
-		// printf("%s\n",mystring);
 		int res = 0;
 		int i = 0;
 		while (mystring[i] != '\n')
 		{
-			// printf("here\n");
 			if (mystring[0] == '-')
 			{
 				break;
