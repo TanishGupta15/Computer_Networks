@@ -8,9 +8,10 @@ struct mydata
     int checkpoints[L];
     string data[L];
     int complete;
-    int port[N-1];
-    const char* ips[N-1];
+	int port[N];
+	const char *ips[N];
     int broadcasted[L];
+    int clientid;
 };
 
 void *controller(void *args)

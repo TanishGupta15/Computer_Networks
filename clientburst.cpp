@@ -12,9 +12,10 @@ struct mydata
     int checkpoints[L];
     string data[L];
     int complete;
-    int port[N-1];
-    const char* ips[N-1];
+ 	int port[N];
+	const char *ips[N];
 	int broadcasted[L];
+	int clientid;
 };
 
 void *clientburst(void *args)
@@ -71,10 +72,10 @@ void *clientburst(void *args)
 			res = 10 * res + (mystring[i] - '0');
 			i++;
 		}
-		printf("%d Complete value", needdata->complete);
+		// printf("%d Complete value", needdata->complete);
 		if (res >= 1 && res <= L)
 		{
-			printf("%d Number filled\n", res);
+			// printf("%d Number filled\n", res);
 			needdata->checkpoints[res - 1] = 1;
 		}
 	}

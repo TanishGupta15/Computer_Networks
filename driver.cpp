@@ -10,9 +10,10 @@ struct mydata
     int checkpoints[L];
     string data[L];
     int complete;
-    int port[N-1];
-    const char* ips[N-1];
+	int port[N];
+    const char *ips[N];
     int broadcasted[L];
+    int clientid;
 };
 
 extern void* client(void* args);
@@ -27,23 +28,17 @@ int main(){
         struct mydata temp;
         args.push_back(temp);
         args[i].complete = 0;
-        ports.push_back(PORTS+i);
     }
 
     string myIP = "127.0.0.1";
-    const char* ips = myIP.c_str();
 
     for(int i = 0; i < N;i++){
-        for(int j = 0; j < N;j++){
-            if(i!=j){
-                int x = (j < i) ? j: j - 1;
-                args[i].port[x] = ports[j];
-                args[i].ips[x] = ips;
-            }
-        }
+        args[i].clientid = i;
+        args[i].ips[i] = myIP.c_str();
     }
 
     for(int i = 0; i < N;i++){
+        // printf("this %p",&args[0]);
         pthread_create(&clients[i],NULL,client, (void*) &args[i]);
     }
 
