@@ -9,8 +9,7 @@ extern void* clientrecv(void *args);
 extern void* controller(void *args);
 extern void* clientbroadcast(void *args);
 
-struct mydata
-{
+struct mydata{
     int checkpoints[L];
     string data[L];
     int complete;
@@ -20,16 +19,14 @@ struct mydata
     int clientid;
 };
 
-void* client(void* arg)
-{
+void* client(void* arg){
+    
     struct mydata* args = (struct mydata*) arg;
     pthread_t clientburster, clientrecver, clientcontroller, clientbroadcaster;
-    for (int i = 0; i < L; i++)
-    {
+    for (int i = 0; i < L; i++) {
         args->checkpoints[i] = 0;
         args->data[i] = "0";
         args->broadcasted[i] = 0;
-
     }
     args->complete = 0;
 

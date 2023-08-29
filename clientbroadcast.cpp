@@ -7,8 +7,8 @@
 #include "constants.h"
 #include <bits/stdc++.h>
 using namespace std;
-struct mydata
-{
+
+struct mydata{
     int checkpoints[L];
     string data[L];
     int complete;
@@ -17,32 +17,32 @@ struct mydata
     int broadcasted[L];
     int clientid;
 };
-struct updated
-{
-    struct mydata neededdata;
+
+struct updated{
+    struct mydata *neededdata;
     int socket;
     char *buffer;
     int start;
 };
 
-void *updating(void *args)
-{
+void *updating(void *args){
     struct updated *updating = (struct updated *)args;
     int sock = updating->socket;
-    char *buff = updating->buffer;
-    char sizeforbuf[2048];
-    buff = sizeforbuf;
-    while (updating->neededdata.complete == 0)
+    // char *buff = updating->buffer;
+    // char sizeforbuf[2048];
+    // buff = sizeforbuf;
+    updating->buffer = new char[2048];
+    while (updating->neededdata->complete == 0)
     {
         if (updating->start == 1)
         {
             updating->start = 0;
             for (int i = 0; i < L; i++)
             {
-                if (updating->neededdata.broadcasted[i] == 0 && updating->neededdata.checkpoints[i] == 1)
+                if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1)
                 {
-                    updating->neededdata.broadcasted[i] = 1;
-                    string temp = to_string(i) + "\n" + updating->neededdata.data[i];
+                    updating->neededdata->broadcasted[i] = 1;
+                    string temp = to_string(i) + "\n" + updating->neededdata->data[i];
                     const char *temp1 = temp.c_str();
                     send(sock, temp1, strlen(temp1), 0);
                     break;
@@ -51,16 +51,21 @@ void *updating(void *args)
         }
         else
         {
-            int val = read(sock, buff, 2048);
-            string reading = buff;
+            int val = read(sock, updating->buffer, 2048);
+            if (val < 0)
+            {
+                perror("read");
+                continue;
+            }
+            string reading = updating->buffer;
             if (reading == "ack")
             {
                 for (int i = 0; i < L; i++)
                 {
-                    if (updating->neededdata.broadcasted[i] == 0 && updating->neededdata.checkpoints[i] == 1)
+                    if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1)
                     {
-                        updating->neededdata.broadcasted[i] = 1;
-                        string temp = to_string(i) + "\n" + updating->neededdata.data[i];
+                        updating->neededdata->broadcasted[i] = 1;
+                        string temp = to_string(i) + "\n" + updating->neededdata->data[i];
                         const char *temp1 = temp.c_str();
                         send(sock, temp1, strlen(temp1), 0);
                         break;
@@ -75,37 +80,50 @@ void *updating(void *args)
     return c;
 }
 
-void *clientbroadcast(void *args)
-{
+void *clientbroadcast(void *args){
+
     struct mydata *needdata = (struct mydata *)args;
     vector<int> listensockets(N);
     vector<int> newsockets(N);
     vector<char *> buffers(N);
     vector<struct sockaddr_in> serveraddrs(N), newcleintaddrs(N);
-    for (int i = 0; i < N; i++)
-    {
-        if (i != needdata->clientid)
-        {
+    for (int i = 0; i < N; i++){
+        if (i != needdata->clientid){
             listensockets[i] = socket(AF_INET, SOCK_STREAM, 0);
+            if(listensockets[i] < 0){
+                perror("socket");
+                cout << "Socket creation failed\n";
+                exit(0);
+            }
+            bzero((char *) &serveraddrs[i], sizeof(serveraddrs[i]));
             serveraddrs[i].sin_addr.s_addr = INADDR_ANY;
             serveraddrs[i].sin_port = PORTS + (needdata->clientid) * (N) + (i);
             serveraddrs[i].sin_family = AF_INET;
-            bind(listensockets[i], (struct sockaddr *)&serveraddrs[i], sizeof(serveraddrs[i]));
-            listen(listensockets[i], 3);
+            int reuse = 1;
+            if (setsockopt(listensockets[i], SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1) {
+                perror("setsockopt");
+                // Handle error
+            }
+
+            if(bind(listensockets[i], (struct sockaddr *)&serveraddrs[i], sizeof(serveraddrs[i])) < 0){
+                perror("bind");
+                cout << "Bind failed\n";
+                exit(0);
+            }
+            if(listen(listensockets[i], 5) < 0){
+                perror("listen");
+                cout << "Listen failed\n";
+                exit(0);
+            }
             cout << "Listening on port " << serveraddrs[i].sin_port << "\n";
         }
     }
-    // cout << "Waiting for connections\n";
-    for (int i = 0; i < N; i++)
-    {
-        if (i != needdata->clientid)
-        {
+
+    for (int i = 0; i < N; i++){
+        if (i != needdata->clientid){
             socklen_t addrlen = sizeof(newcleintaddrs[i]);
-            cout << "stuck\n";
-            newsockets[i] = accept(listensockets[i], (struct sockaddr *)&newcleintaddrs[i], &addrlen);
-            cout << "stuckend\n";
-            if (newsockets[i] < 0)
-            {
+            if((newsockets[i] = accept(listensockets[i], (struct sockaddr*) &newcleintaddrs[i], &addrlen)) < 0){
+                perror("accept");
                 cout << "Connection failed\n";
                 continue;
             }
@@ -115,19 +133,16 @@ void *clientbroadcast(void *args)
     // cout << "Connected\n";
     vector<pthread_t> broadcasters(N);
     vector<struct updated> arguments(N);
-    for (int i = 0; i < N; i++)
-    {
-        if (i != needdata->clientid)
-        {
+    for (int i = 0; i < N; i++){
+        if (i != needdata->clientid){
             arguments[i].buffer = buffers[i];
             arguments[i].socket = newsockets[i];
-            arguments[i].neededdata = *needdata;
+            arguments[i].neededdata = needdata;
             arguments[i].start = 1;
             pthread_create(&broadcasters[i], NULL, updating, &arguments[i]);
         }
     }
-    for (int i = 0; i < N; i++)
-    {
+    for (int i = 0; i < N; i++){
         if (i != needdata->clientid)
             pthread_join(broadcasters[i], NULL);
     }

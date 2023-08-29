@@ -5,8 +5,7 @@
 #include "constants.h"
 using namespace std;
 
-struct mydata
-{
+struct mydata{
     int checkpoints[L];
     string data[L];
     int complete;
@@ -17,7 +16,6 @@ struct mydata
 };
 
 extern void* client(void* args);
-
 
 int main(){
 
@@ -32,7 +30,7 @@ int main(){
 
     string myIP = "127.0.0.1";
 
-    for(int i = 0; i < N;i++){
+    for(int i = 0; i < N; i++){
         args[i].clientid = i;
         args[i].ips[i] = myIP.c_str();
     }
@@ -42,7 +40,7 @@ int main(){
         pthread_create(&clients[i],NULL,client, (void*) &args[i]);
     }
 
-    for(int i = 0; i < N;i++){
+    for(int i = 0; i < N; i++){
         pthread_join(clients[i],NULL);
     }
     
