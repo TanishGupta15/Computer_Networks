@@ -31,7 +31,7 @@ void *updating(void *args){
     // char *buff = updating->buffer;
     // char sizeforbuf[2048];
     // buff = sizeforbuf;
-    updating->buffer = new char[2048];
+    updating->buffer = new char[BUFFER_SIZE];
     while (updating->neededdata->complete == 0)
     {
         if (updating->start == 1)
@@ -51,7 +51,7 @@ void *updating(void *args){
         }
         else
         {
-            int val = read(sock, updating->buffer, 2048);
+            int val = read(sock, updating->buffer, BUFFER_SIZE);
             if (val < 0)
             {
                 perror("read");

@@ -46,6 +46,7 @@ void *updatin(void *args)
 		{
 			int res = 0;
 			int i = 0;
+			if(reading[0] == '-') continue;
 			// cout << "Reading " << reading << endl;
 			while (i < reading.size() && reading[i] != '\n')
 			{
@@ -58,6 +59,8 @@ void *updatin(void *args)
 			{
 				resdata += reading[j];
 			}
+			// if(res == -1)
+			cout << "Res = " << res << endl;
 			updating->needed_data->checkpoints[res] = 1;
 			updating->needed_data->data[res] = resdata;
 			send(updating->socket, ack, strlen(ack), 0);
