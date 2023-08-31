@@ -32,17 +32,26 @@ int main(){
 
     for(int i = 0; i < N; i++){
         args[i].clientid = i;
-        args[i].ips[i] = myIP.c_str();
+        // args[i].ips[i] = myIP.c_str();
     }
 
-    for(int i = 0; i < N;i++){
-        // printf("this %p",&args[0]);
-        pthread_create(&clients[i],NULL,client, (void*) &args[i]);
-    }
+    string ip0 = "10.194.46.195";
+    args[0].ips[0] = ip0.c_str();
+    string ip1 = "10.194.14.15";
+    args[1].ips[1] = ip1.c_str();
 
-    for(int i = 0; i < N; i++){
-        pthread_join(clients[i],NULL);
-    }
+
+
+    // for(int i = 0; i < N;i++){
+    //     // printf("this %p",&args[0]);
+    //     pthread_create(&clients[i],NULL,client, (void*) &args[i]);
+    // }
+
+    // for(int i = 0; i < N; i++){
+    //     pthread_join(clients[i],NULL);
+    // }
+
+    client((void*) &args[1]);
     
     cout << "Completed Session\n";
     return 0;

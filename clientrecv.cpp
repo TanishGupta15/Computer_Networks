@@ -32,11 +32,11 @@ void *updatin(void *args)
 	const char *ack = temp1.c_str();
 	int sock = updating->socket;
 	char *buff = updating->buffer;
-	char sizeforbuf[2048];
-	buff = sizeforbuf;
+	// char sizeforbuf[2048];
+	// buff = sizeforbuf;
 	while (updating->needed_data->complete == 0)
 	{
-		int valread = read(sock, buff, 2048);
+		int valread = read(sock, buff, BUFFER_SIZE);
 		if(valread < 0){
 			perror("read");
 			continue;
@@ -46,7 +46,8 @@ void *updatin(void *args)
 		{
 			int res = 0;
 			int i = 0;
-			while (reading[i] != '\n')
+			// cout << "Reading " << reading << endl;
+			while (i < reading.size() && reading[i] != '\n')
 			{
 				res = res * 10 + (reading[i] - '0');
 				i++;
@@ -103,9 +104,9 @@ void *clientrecv(void *args)
 	for (int i = 0; i < N; i++){
 		if (i != need_data->clientid) {
 			// For now, just hardcoded, giving error;
-			string SIPTEMP = "127.0.0.1";
-			const char *SIP = SIPTEMP.c_str();
-			if (inet_pton(AF_INET, SIP, &serv_addrs[i].sin_addr) <= 0){
+			string str = "10.194.46.195";
+			const char* x = str.c_str();
+			if (inet_pton(AF_INET, x, &serv_addrs[i].sin_addr) <= 0){
 				int a = 2;
 				int *b = &a;
 				void *c = (void *)b;
