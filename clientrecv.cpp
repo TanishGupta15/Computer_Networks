@@ -24,44 +24,41 @@ struct updated {
 	char *buffer;
 };
 
-void *updatin(void *args)
-{
-	string reading;
+void *updatin(void *args){
+
+	string reading = "";
 	struct updated *updating = (struct updated *)args;
 	string temp1 = "ack";
 	const char *ack = temp1.c_str();
 	int sock = updating->socket;
 	char *buff = updating->buffer;
-	// char sizeforbuf[2048];
-	// buff = sizeforbuf;
-	while (updating->needed_data->complete == 0)
-	{
+	while (updating->needed_data->complete == 0){
 		int valread = read(sock, buff, BUFFER_SIZE);
 		if(valread < 0){
 			perror("read");
 			continue;
 		}
+		if(valread == 0) continue;
 		reading = buff;
-		if (reading != "")
-		{
+		if (reading != ""){
 			int res = 0;
 			int i = 0;
-			if(reading[0] == '-') continue;
-			// cout << "Reading " << reading << endl;
-			while (i < reading.size() && reading[i] != '\n')
-			{
-				res = res * 10 + (reading[i] - '0');
+			if(reading[0] == '-') continue;// Shouldn't happen
+			cout << "Reading " << reading << endl;
+			while (i < (int)reading.size() && reading[i] != '\n'){
+				res = res * 10 + int(reading[i] - '0');
 				i++;
 			}
 			i++;
-			string resdata;
-			for (int j = i; j < (int)reading.length() - 1; j++)
-			{
+			string resdata = "";
+			for (int j = i; j < (int)reading.length(); j++){
 				resdata += reading[j];
+				if(reading[j] == '\n') break;
 			}
 			// if(res == -1)
 			cout << "Res = " << res << endl;
 			updating->needed_data->checkpoints[res] = 1;
+			updating->needed_data->broadcasted[res] = 1;
 			updating->needed_data->data[res] = resdata;
 			send(updating->socket, ack, strlen(ack), 0);
 		}
@@ -107,7 +104,10 @@ void *clientrecv(void *args)
 	for (int i = 0; i < N; i++){
 		if (i != need_data->clientid) {
 			// For now, just hardcoded, giving error;
-			string str = "10.194.46.195";
+			string str = "127.0.0.1";
+			#ifndef SINGLE
+				str = "10.194.46.195";
+			#endif
 			const char* x = str.c_str();
 			if (inet_pton(AF_INET, x, &serv_addrs[i].sin_addr) <= 0){
 				int a = 2;

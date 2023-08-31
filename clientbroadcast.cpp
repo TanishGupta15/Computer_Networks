@@ -28,42 +28,32 @@ struct updated{
 void *updating(void *args){
     struct updated *updating = (struct updated *)args;
     int sock = updating->socket;
-    // char *buff = updating->buffer;
-    // char sizeforbuf[2048];
-    // buff = sizeforbuf;
     updating->buffer = new char[BUFFER_SIZE];
     while (updating->neededdata->complete == 0)
     {
-        if (updating->start == 1)
-        {
-            updating->start = 0;
-            for (int i = 0; i < L; i++)
-            {
-                if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1)
-                {
+        if (updating->start == 1){
+            for (int i = 0; i < L; i++){
+                if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
                     updating->neededdata->broadcasted[i] = 1;
                     string temp = to_string(i) + "\n" + updating->neededdata->data[i];
                     const char *temp1 = temp.c_str();
                     send(sock, temp1, strlen(temp1), 0);
+                    updating->start = 0;
                     break;
                 }
             }
         }
-        else
-        {
+        else{
             int val = read(sock, updating->buffer, BUFFER_SIZE);
-            if (val < 0)
-            {
+            if (val < 0){
                 perror("read");
                 continue;
             }
             string reading = updating->buffer;
-            if (reading == "ack")
-            {
-                for (int i = 0; i < L; i++)
-                {
-                    if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1)
-                    {
+            if (reading == "ack"){
+                cout << "Received ack\n";
+                for (int i = 0; i < L; i++){
+                    if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
                         updating->neededdata->broadcasted[i] = 1;
                         string temp = to_string(i) + "\n" + updating->neededdata->data[i];
                         const char *temp1 = temp.c_str();

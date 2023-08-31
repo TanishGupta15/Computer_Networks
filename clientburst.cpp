@@ -80,11 +80,10 @@ void *clientburst(void *args){
 		}
 		if (res >= 1 && res <= L){
 			needdata->checkpoints[res - 1] = 1;
-			string data = "";
-			//TODO: What is the buffer size needed for the data?
+			string data = "";	
 			for (int j = i + 1; j < (int)mystring.length(); j++){
-				if(mystring[j] == '\n') break;
 				data += mystring[j];
+				if(mystring[j] == '\n') break;
 			}
 			needdata->data[res - 1] = data;
 		}
