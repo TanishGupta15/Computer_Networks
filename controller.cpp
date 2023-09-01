@@ -16,6 +16,7 @@ struct mydata{
 //TODO: Log data to some file to draw graphs
 void *controller(void *args) {
     struct mydata* mydat = (struct mydata*) args;
+    bool written = false;
     while (mydat->complete == 0) {
         int chk = 1, cnt = 0;
         for (int i = 0; i < L; i++){

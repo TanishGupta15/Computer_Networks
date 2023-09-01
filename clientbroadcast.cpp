@@ -29,13 +29,12 @@ void *updating(void *args){
     struct updated *updating = (struct updated *)args;
     int sock = updating->socket;
     updating->buffer = new char[BUFFER_SIZE];
-    while (updating->neededdata->complete == 0)
-    {
+    while (updating->neededdata->complete == 0){
         if (updating->start == 1){
             for (int i = 0; i < L; i++){
                 if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
                     updating->neededdata->broadcasted[i] = 1;
-                    string temp = to_string(i) + "\n" + updating->neededdata->data[i];
+                    string temp = to_string(i) + "\n" + updating->neededdata->data[i]; //Aldready included the linebreak in the data
                     const char *temp1 = temp.c_str();
                     send(sock, temp1, strlen(temp1), 0);
                     updating->start = 0;
@@ -51,7 +50,6 @@ void *updating(void *args){
             }
             string reading = updating->buffer;
             if (reading == "ack"){
-                cout << "Received ack\n";
                 for (int i = 0; i < L; i++){
                     if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
                         updating->neededdata->broadcasted[i] = 1;

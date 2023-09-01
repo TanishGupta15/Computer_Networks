@@ -8,6 +8,7 @@
 #include <pthread.h>
 using namespace std;
 
+//TODO: Change all these allocations on stack to heap
 struct mydata {
 	int checkpoints[L];
 	string data[L];
@@ -43,8 +44,8 @@ void *updatin(void *args){
 		if (reading != ""){
 			int res = 0;
 			int i = 0;
-			if(reading[0] == '-') continue;// Shouldn't happen
-			cout << "Reading " << reading << endl;
+			if(reading[0] == '-') continue; // Shouldn't happen
+			// cout << "Reading " << reading << endl;
 			while (i < (int)reading.size() && reading[i] != '\n'){
 				res = res * 10 + int(reading[i] - '0');
 				i++;
@@ -56,7 +57,7 @@ void *updatin(void *args){
 				if(reading[j] == '\n') break;
 			}
 			// if(res == -1)
-			cout << "Res = " << res << endl;
+			// cout << "Res = " << res << endl;
 			updating->needed_data->checkpoints[res] = 1;
 			updating->needed_data->broadcasted[res] = 1;
 			updating->needed_data->data[res] = resdata;

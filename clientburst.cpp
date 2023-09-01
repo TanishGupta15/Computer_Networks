@@ -70,22 +70,22 @@ void *clientburst(void *args){
 		int res = 0;
 		int i = 0;
 		// if((int)mystring.size() && mystring[0] != -1) cout << "mystring = " << mystring << endl;
-		while ((int)mystring.size() && i < (int)mystring.size() && mystring[i] != '\n'){
-			if (mystring[0] == '-'){
-				// This means that the server has sent a -1
-				break;
-			}
+		if((int)mystring.size() && mystring[0] == '-'){
+			// This means that the server has sent a -1
+			continue;
+		}
+		while (i < (int)mystring.size() && mystring[i] != '\n'){
 			res = 10 * res + (mystring[i] - '0');
 			i++;
 		}
-		if (res >= 1 && res <= L){
-			needdata->checkpoints[res - 1] = 1;
-			string data = "";	
+		if (res >= 0 && res < L){
+			needdata->checkpoints[res] = 1;
+			string data = "";
 			for (int j = i + 1; j < (int)mystring.length(); j++){
 				data += mystring[j];
 				if(mystring[j] == '\n') break;
 			}
-			needdata->data[res - 1] = data;
+			needdata->data[res] = data;
 		}
 	}
 
@@ -111,12 +111,12 @@ void *clientburst(void *args){
 	}
 
 	for(int i = 0; i < L; i++){
-		const char* temp = (to_string(i+1) + "\n").c_str();
+		const char* temp = (to_string(i) + "\n").c_str();
 		while(send(client_fd, temp, strlen(temp), 0) < 0){
 			perror("send");
 			continue;
 		}
-		const char* data = (needdata->data[i] + "\n").c_str();
+		const char* data = (needdata->data[i]).c_str(); //TODO: Check this - line break needed here or not
 		while(send(client_fd, data, strlen(data), 0) < 0){
 			perror("send");
 			continue;
@@ -137,8 +137,8 @@ void *clientburst(void *args){
 	string mystring = buffer;
 	// cout till a newline
 	for(int i = 0; i < (int)mystring.size(); i++){
-		if(mystring[i] == '\n') break;
 		cout << mystring[i];
+		if(mystring[i] == '\n') break;
 	}
 
 	close(client_fd);
