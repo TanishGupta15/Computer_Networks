@@ -89,7 +89,7 @@ void *clientburst(void *args){
 		}
 	}
 
-	//TODO: Send SUBMIT to server  Getting Line Number Parsing Error
+	//TODO: What if SUBMIT is the 101st command in that second?
 	const char* submit = "SUBMIT\n";
 	while(send(client_fd, submit, strlen(submit), 0) < 0){
 		perror("send");
@@ -116,7 +116,7 @@ void *clientburst(void *args){
 			perror("send");
 			continue;
 		}
-		const char* data = (needdata->data[i]).c_str(); //TODO: Check this - line break needed here or not
+		const char* data = (needdata->data[i]).c_str();
 		while(send(client_fd, data, strlen(data), 0) < 0){
 			perror("send");
 			continue;
@@ -126,6 +126,7 @@ void *clientburst(void *args){
 	cout << "Done sending, yay :)\n";
 
 	// read the input from the server
+	//TODO: What if I have not yet received the response from the server??
 	valread = read(client_fd, buffer, BUFFER_SIZE);
 	if(valread < 0){
 		perror("read");
@@ -135,7 +136,6 @@ void *clientburst(void *args){
 		return c;
 	}
 	string mystring = buffer;
-	// cout till a newline
 	for(int i = 0; i < (int)mystring.size(); i++){
 		cout << mystring[i];
 		if(mystring[i] == '\n') break;
