@@ -30,26 +30,26 @@ void *updating(void *args){
     int sock = updating->socket;
     updating->buffer = new char[BUFFER_SIZE];
     while (updating->neededdata->complete == 0){
-        if (updating->start == 1){
-            for (int i = 0; i < L; i++){
-                if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
-                    updating->neededdata->broadcasted[i] = 1;
-                    string temp = to_string(i) + "\n" + updating->neededdata->data[i]; //Aldready included the linebreak in the data
-                    const char *temp1 = temp.c_str();
-                    send(sock, temp1, strlen(temp1), 0);
-                    updating->start = 0;
-                    break;
-                }
-            }
-        }
-        else{
-            int val = read(sock, updating->buffer, BUFFER_SIZE);
-            if (val < 0){
-                perror("read");
-                continue;
-            }
-            string reading = updating->buffer;
-            if (reading == "ack"){
+        // if (updating->start == 1){
+        //     for (int i = 0; i < L; i++){
+        //         if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
+        //             updating->neededdata->broadcasted[i] = 1;
+        //             string temp = to_string(i) + "\n" + updating->neededdata->data[i]; //Aldready included the linebreak in the data
+        //             const char *temp1 = temp.c_str();
+        //             send(sock, temp1, strlen(temp1), 0);
+        //             updating->start = 0;
+        //             break;
+        //         }
+        //     }
+        // }
+        // else{
+            // int val = read(sock, updating->buffer, BUFFER_SIZE);
+            // if (val < 0){
+            //     perror("read");
+            //     continue;
+            // }
+            // string reading = updating->buffer;
+            // if (reading == "ack"){
                 for (int i = 0; i < L; i++){
                     if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
                         updating->neededdata->broadcasted[i] = 1;
@@ -59,8 +59,8 @@ void *updating(void *args){
                         break;
                     }
                 }
-            }
-        }
+            // }
+        // }
     }
     int a = 2;
     int *b = &a;

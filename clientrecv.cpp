@@ -34,7 +34,8 @@ void *updatin(void *args){
 	int sock = updating->socket;
 	char *buff = updating->buffer;
 	while (updating->needed_data->complete == 0){
-		int valread = read(sock, buff, BUFFER_SIZE);
+		// int valread = read(sock, buff, BUFFER_SIZE);
+		int valread = recv(sock, buff, BUFFER_SIZE, 0);
 		if(valread < 0){
 			perror("read");
 			continue;
@@ -61,6 +62,7 @@ void *updatin(void *args){
 			updating->needed_data->checkpoints[res] = 1;
 			updating->needed_data->broadcasted[res] = 1;
 			updating->needed_data->data[res] = resdata;
+			cout << "Received packet_num = " << res << endl;
 			send(updating->socket, ack, strlen(ack), 0);
 		}
 	}

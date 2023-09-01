@@ -57,15 +57,23 @@ void *clientburst(void *args){
 			perror("send");
 			continue;
 		}
-		valread = read(client_fd, buffer, BUFFER_SIZE);
-		if(valread < 0){
-			perror("read");
+
+		// recv the data from the server
+		int recv_data = recv(client_fd, buffer, BUFFER_SIZE, 0);
+		if(recv_data < 0){
+			perror("recv");
 			continue;
-			// int a = 2;
-			// int *b = &a;
-			// void *c = (void *)b;
-			// return c;
 		}
+
+		// valread = read(client_fd, buffer, BUFFER_SIZE);
+		// if(valread < 0){
+		// 	perror("read");
+		// 	continue;
+		// 	// int a = 2;
+		// 	// int *b = &a;
+		// 	// void *c = (void *)b;
+		// 	// return c;
+		// }
 		string mystring = buffer;
 		int res = 0;
 		int i = 0;
@@ -89,7 +97,7 @@ void *clientburst(void *args){
 		}
 	}
 
-	//TODO: What if SUBMIT is the 101st command in that second?
+	//TODO: Can combine all these sends?
 	const char* submit = "SUBMIT\n";
 	while(send(client_fd, submit, strlen(submit), 0) < 0){
 		perror("send");
@@ -121,20 +129,31 @@ void *clientburst(void *args){
 			perror("send");
 			continue;
 		}
+		cout << "Sent packet_num = " << i << endl;
 	}
 
 	cout << "Done sending, yay :)\n";
 
-	// read the input from the server
-	//TODO: What if I have not yet received the response from the server??
-	valread = read(client_fd, buffer, BUFFER_SIZE);
-	if(valread < 0){
-		perror("read");
+	// recv the data from the server
+	int recv_data = recv(client_fd, buffer, BUFFER_SIZE, 0);
+	if(recv_data < 0){
+		perror("recv");
 		int a = 2;
 		int *b = &a;
 		void *c = (void *)b;
 		return c;
 	}
+
+	// read the input from the server
+	//TODO: What if I have not yet received the response from the server??
+	// valread = read(client_fd, buffer, BUFFER_SIZE);
+	// if(valread < 0){
+	// 	perror("read");
+	// 	int a = 2;
+	// 	int *b = &a;
+	// 	void *c = (void *)b;
+	// 	return c;
+	// }
 	string mystring = buffer;
 	for(int i = 0; i < (int)mystring.size(); i++){
 		cout << mystring[i];

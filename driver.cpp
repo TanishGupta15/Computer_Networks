@@ -38,9 +38,9 @@ int main(){
     }
 
     #ifndef SINGLE
-        string ip0 = "10.194.46.195";
+        string ip0 = "10.194.14.15";
         args[0].ips[0] = ip0.c_str();
-        string ip1 = "10.194.14.15";
+        string ip1 = "10.194.46.195";
         args[1].ips[1] = ip1.c_str();
     #endif
 
@@ -57,7 +57,7 @@ int main(){
     #endif
 
     #ifndef SINGLE
-        client((void*) &args[1]);
+        client((void*) &args[0]);
     #endif
     
     cout << "Completed Session\n";
