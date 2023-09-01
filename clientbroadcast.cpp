@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "constants.h"
 #include <bits/stdc++.h>
+#include <fstream>
 using namespace std;
 
 struct mydata{
@@ -26,45 +27,61 @@ struct updated{
 };
 
 void *updating(void *args){
+    ofstream fout("log.txt");
     struct updated *updating = (struct updated *)args;
     int sock = updating->socket;
     updating->buffer = new char[BUFFER_SIZE];
+    // bool sent = false;
     while (updating->neededdata->complete == 0){
-        // if (updating->start == 1){
-        //     for (int i = 0; i < L; i++){
-        //         if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
-        //             updating->neededdata->broadcasted[i] = 1;
-        //             string temp = to_string(i) + "\n" + updating->neededdata->data[i]; //Aldready included the linebreak in the data
-        //             const char *temp1 = temp.c_str();
-        //             send(sock, temp1, strlen(temp1), 0);
-        //             updating->start = 0;
-        //             break;
-        //         }
-        //     }
-        // }
-        // else{
-            // int val = read(sock, updating->buffer, BUFFER_SIZE);
-            // if (val < 0){
-            //     perror("read");
-            //     continue;
-            // }
-            // string reading = updating->buffer;
-            // if (reading == "ack"){
+        cout << "updating->start = " << updating->start << endl;
+        if (updating->start == 1){
+            for (int i = 0; i < L; i++){
+                if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
+                    updating->neededdata->broadcasted[i] = 1;
+                    string temp = to_string(i) + "\n" + updating->neededdata->data[i]; //Aldready included the linebreak in the data
+                    const char *temp1 = temp.c_str();
+                    send(sock, temp1, strlen(temp1), 0);
+                    // sent = true;
+                    updating->start = 0;
+                    break;
+                }
+            }
+        }
+        else{
+            int val = recv(sock, updating->buffer, BUFFER_SIZE, 0);
+            if (val < 0){
+                perror("read");
+                continue;
+            }
+            string reading = updating->buffer;
+            cout << "Reading in broadcast " << reading << endl;
+            if (reading == "ack"){
+                cout << "Received ack\n";
+                fout << "Received ack" << endl;
+                updating->start = 1;
                 for (int i = 0; i < L; i++){
                     if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
                         updating->neededdata->broadcasted[i] = 1;
                         string temp = to_string(i) + "\n" + updating->neededdata->data[i];
                         const char *temp1 = temp.c_str();
+                        fout << temp1 << endl;
                         send(sock, temp1, strlen(temp1), 0);
+                        updating->start = 0;
                         break;
                     }
                 }
+            }
+            // clear buffer
+            // for (int i = 0; i < BUFFER_SIZE; i++){
+            //     updating->buffer[i] = '\0';
             // }
-        // }
+        }
     }
     int a = 2;
     int *b = &a;
     void *c = (void *)b;
+    // close file
+    fout.close();
     return c;
 }
 

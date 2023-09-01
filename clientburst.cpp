@@ -51,6 +51,8 @@ void *clientburst(void *args){
 		return c;
 	}
 
+	int cnt = 0;
+
 	while (needdata->complete == 0) {
 		// sleep(2);
 		if(send(client_fd, hello, strlen(hello), 0) < 0){
@@ -59,6 +61,16 @@ void *clientburst(void *args){
 		}
 
 		// recv the data from the server
+		int cnt = 0;
+		// while(true){
+		// 	int recv_data = recv(client_fd, buffer + cnt, BUFFER_SIZE, 0);
+		// 	if(recv_data < 0){
+		// 		perror("recv");
+		// 		continue;
+		// 	}
+		// 	if(buffer[recv_data - 1] == '\n') break;
+		// 	cnt += recv_data;
+		// }
 		int recv_data = recv(client_fd, buffer, BUFFER_SIZE, 0);
 		if(recv_data < 0){
 			perror("recv");
@@ -87,15 +99,20 @@ void *clientburst(void *args){
 			i++;
 		}
 		if (res >= 0 && res < L){
-			needdata->checkpoints[res] = 1;
 			string data = "";
 			for (int j = i + 1; j < (int)mystring.length(); j++){
 				data += mystring[j];
 				if(mystring[j] == '\n') break;
 			}
+			if(needdata->checkpoints[res] == 0){
+				cnt++;
+			}
 			needdata->data[res] = data;
+			needdata->checkpoints[res] = 1;
 		}
 	}
+
+	cout << "Received " << cnt << " packets from server\n";
 
 	//TODO: Can combine all these sends?
 	const char* submit = "SUBMIT\n";

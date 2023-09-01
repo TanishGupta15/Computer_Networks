@@ -6,6 +6,7 @@
 #include <bits/stdc++.h>
 #include "constants.h"
 #include <pthread.h>
+#include <fstream>
 using namespace std;
 
 //TODO: Change all these allocations on stack to heap
@@ -27,6 +28,7 @@ struct updated {
 
 void *updatin(void *args){
 
+	ofstream fout("recv_log.txt");
 	string reading = "";
 	struct updated *updating = (struct updated *)args;
 	string temp1 = "ack";
@@ -35,13 +37,29 @@ void *updatin(void *args){
 	char *buff = updating->buffer;
 	while (updating->needed_data->complete == 0){
 		// int valread = read(sock, buff, BUFFER_SIZE);
-		int valread = recv(sock, buff, BUFFER_SIZE, 0);
-		if(valread < 0){
-			perror("read");
-			continue;
-		}
-		if(valread == 0) continue;
-		reading = buff;
+		// int valread = recv(sock, buff, BUFFER_SIZE, 0);
+		// if(valread < 0){
+		// 	perror("read");
+		// 	continue;
+		// }
+		// if(valread == 0) continue;
+		int count = 0;
+		reading = "";
+		while(count < 2){
+            int x = recv(sock, buff, BUFFER_SIZE, 0);
+            if(x < 0){
+                perror("recv");
+                continue;
+            }
+            for(int i = 0; i < x; i++){
+                if(buff[i] == '\n') count++;
+                reading += buff[i];
+                if(count == 2) break;
+            }
+        }
+		// reading = buff;
+		fout << "Buffer = " << buff << endl;
+		fout << "Reading = " << reading << endl;
 		if (reading != ""){
 			int res = 0;
 			int i = 0;
@@ -59,6 +77,7 @@ void *updatin(void *args){
 			}
 			// if(res == -1)
 			// cout << "Res = " << res << endl;
+			//TODO: If res already exist, then don't update
 			updating->needed_data->checkpoints[res] = 1;
 			updating->needed_data->broadcasted[res] = 1;
 			updating->needed_data->data[res] = resdata;
@@ -69,6 +88,7 @@ void *updatin(void *args){
 	int a = 2;
 	int *b = &a;
 	void *c = (void *)b;
+	fout.close();
 	return c;
 }
 
