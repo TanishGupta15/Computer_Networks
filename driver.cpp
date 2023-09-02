@@ -42,6 +42,8 @@ int main(){
         args[0].ips[0] = ip0.c_str();
         string ip1 = "10.194.46.195";
         args[1].ips[1] = ip1.c_str();
+        string ip2 = "10.194.25.114";
+        args[2].ips[2] = ip2.c_str();
     #endif
 
 

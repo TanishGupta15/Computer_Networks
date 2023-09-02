@@ -28,7 +28,7 @@ void *controller(void *args) {
         if (chk == 1){
             mydat->complete = 1;
         }
-        if(cnt % 100 == 0)
+        // if(cnt % 100 == 0)
             cout << "Received " << cnt << " packets\n";
     }
     int a = 2;

@@ -24,25 +24,19 @@ struct updated {
 	struct mydata *needed_data;
 	int socket;
 	char *buffer;
+	int clientid;
 };
 
 void *updatin(void *args){
 
-	ofstream fout("recv_log.txt");
 	string reading = "";
 	struct updated *updating = (struct updated *)args;
+	ofstream fout("recv_log_" + to_string(updating->clientid) + ".txt");
 	string temp1 = "ack";
 	const char *ack = temp1.c_str();
 	int sock = updating->socket;
 	char *buff = updating->buffer;
 	while (updating->needed_data->complete == 0){
-		// int valread = read(sock, buff, BUFFER_SIZE);
-		// int valread = recv(sock, buff, BUFFER_SIZE, 0);
-		// if(valread < 0){
-		// 	perror("read");
-		// 	continue;
-		// }
-		// if(valread == 0) continue;
 		int count = 0;
 		reading = "";
 		while(count < 2){
@@ -129,7 +123,10 @@ void *clientrecv(void *args)
 			// For now, just hardcoded, giving error;
 			string str = "127.0.0.1";
 			#ifndef SINGLE
-				str = "10.194.46.195";
+				if(i == 1)
+					str = "10.194.46.195";
+				else if(i == 2)
+					str = "10.194.25.114";
 			#endif
 			const char* x = str.c_str();
 			if (inet_pton(AF_INET, x, &serv_addrs[i].sin_addr) <= 0){
@@ -172,6 +169,7 @@ void *clientrecv(void *args)
 			arguments[i].socket = receivers[i];
 			arguments[i].buffer = buffers[i];
 			arguments[i].needed_data = need_data;
+			arguments[i].clientid = i;
 			pthread_create(&updaters[i], NULL, updatin, &arguments[i]);
 		}
 	}

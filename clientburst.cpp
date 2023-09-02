@@ -71,21 +71,13 @@ void *clientburst(void *args){
 		// 	if(buffer[recv_data - 1] == '\n') break;
 		// 	cnt += recv_data;
 		// }
+		//TODO: Change this to while loop
 		int recv_data = recv(client_fd, buffer, BUFFER_SIZE, 0);
 		if(recv_data < 0){
 			perror("recv");
 			continue;
 		}
 
-		// valread = read(client_fd, buffer, BUFFER_SIZE);
-		// if(valread < 0){
-		// 	perror("read");
-		// 	continue;
-		// 	// int a = 2;
-		// 	// int *b = &a;
-		// 	// void *c = (void *)b;
-		// 	// return c;
-		// }
 		string mystring = buffer;
 		int res = 0;
 		int i = 0;
@@ -114,7 +106,6 @@ void *clientburst(void *args){
 
 	cout << "Received " << cnt << " packets from server\n";
 
-	//TODO: Can combine all these sends?
 	const char* submit = "SUBMIT\n";
 	while(send(client_fd, submit, strlen(submit), 0) < 0){
 		perror("send");
@@ -151,26 +142,21 @@ void *clientburst(void *args){
 
 	cout << "Done sending, yay :)\n";
 
-	// recv the data from the server
-	int recv_data = recv(client_fd, buffer, BUFFER_SIZE, 0);
-	if(recv_data < 0){
-		perror("recv");
-		int a = 2;
-		int *b = &a;
-		void *c = (void *)b;
-		return c;
+	string reading = "";
+	int count = 0;
+	while(count < 1){
+		int x = recv(client_fd, buffer, BUFFER_SIZE, 0);
+		if(x < 0){
+			perror("recv");
+			continue;
+		}
+		for(int i = 0; i < x; i++){
+			if(buffer[i] == '\n') count++;
+			reading += buffer[i];
+			if(count == 1) break;
+		}
 	}
 
-	// read the input from the server
-	//TODO: What if I have not yet received the response from the server??
-	// valread = read(client_fd, buffer, BUFFER_SIZE);
-	// if(valread < 0){
-	// 	perror("read");
-	// 	int a = 2;
-	// 	int *b = &a;
-	// 	void *c = (void *)b;
-	// 	return c;
-	// }
 	string mystring = buffer;
 	for(int i = 0; i < (int)mystring.size(); i++){
 		cout << mystring[i];

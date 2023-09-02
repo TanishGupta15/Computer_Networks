@@ -24,16 +24,17 @@ struct updated{
     int socket;
     char *buffer;
     int start;
+    int clientid;
 };
 
 void *updating(void *args){
-    ofstream fout("log.txt");
     struct updated *updating = (struct updated *)args;
+    ofstream fout("send_log_" + to_string(updating->clientid) + ".txt");
     int sock = updating->socket;
     updating->buffer = new char[BUFFER_SIZE];
     // bool sent = false;
     while (updating->neededdata->complete == 0){
-        cout << "updating->start = " << updating->start << endl;
+        // cout << "updating->start = " << updating->start << endl;
         if (updating->start == 1){
             for (int i = 0; i < L; i++){
                 if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
@@ -144,6 +145,7 @@ void *clientbroadcast(void *args){
             arguments[i].socket = newsockets[i];
             arguments[i].neededdata = needdata;
             arguments[i].start = 1;
+            arguments[i].clientid = i;
             pthread_create(&broadcasters[i], NULL, updating, &arguments[i]);
         }
     }
