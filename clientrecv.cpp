@@ -123,10 +123,12 @@ void *clientrecv(void *args)
 			// For now, just hardcoded, giving error;
 			string str = "127.0.0.1";
 			#ifndef SINGLE
+				if(i == 0)
+					str = IP0;
 				if(i == 1)
-					str = "10.194.46.195";
+					str = IP1;
 				else if(i == 2)
-					str = "10.194.25.114";
+					str = IP2;
 			#endif
 			const char* x = str.c_str();
 			if (inet_pton(AF_INET, x, &serv_addrs[i].sin_addr) <= 0){
