@@ -6,4 +6,6 @@
 #define IP0 "10.194.14.15"
 #define IP1 "10.194.46.195"
 #define IP2 "10.194.25.114"
+#define client_id 0
+#define kerberos "cs1200397"
 // #define SINGLE

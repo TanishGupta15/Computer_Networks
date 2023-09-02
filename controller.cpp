@@ -16,6 +16,7 @@ struct mydata{
 //TODO: Log data to some file to draw graphs
 void *controller(void *args) {
     struct mydata* mydat = (struct mydata*) args;
+    bool printed = false;
     while (mydat->complete == 0) {
         int chk = 1, cnt = 0;
         for (int i = 0; i < L; i++){
@@ -28,8 +29,14 @@ void *controller(void *args) {
         if (chk == 1){
             mydat->complete = 1;
         }
-        // if(cnt % 100 == 0)
-            cout << "Received " << cnt << " packets\n";
+        if(cnt % 100 == 0){
+            if(!printed){
+                cout << "Received " << cnt << " packets\n";
+                printed = true;
+            }
+        }
+        else printed = false;
+            // cout << "Received " << cnt << " packets\n";
     }
     int a = 2;
     int *b = &a;

@@ -1,0 +1,11 @@
+1. macros for return
+2. macros for person, personid
+3. queue for sending packets
+4. ifdefs for debug
+5. threads exit properly
+6. send even after having 1000 for self
+7. try without ack
+
+
+Remove fout cout before submit
+

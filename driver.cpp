@@ -56,7 +56,7 @@ int main(){
     #endif
 
     #ifndef SINGLE
-        client((void*) &args[0]);
+        client((void*) &args[client_id]);
     #endif
     
     cout << "Completed Session\n";

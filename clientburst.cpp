@@ -61,7 +61,7 @@ void *clientburst(void *args){
 		}
 
 		// recv the data from the server
-		int cnt = 0;
+		// int cnt = 0;
 		// while(true){
 		// 	int recv_data = recv(client_fd, buffer + cnt, BUFFER_SIZE, 0);
 		// 	if(recv_data < 0){
@@ -112,7 +112,7 @@ void *clientburst(void *args){
 		continue;
 	}
 	// no need to read anything 
-	const char* id = "cs1200397@bitmask\n";
+	const char* id = (string(kerberos) + "@bitmask\n").c_str();
 	while(send(client_fd, id, strlen(id), 0) < 0){
 		perror("send");
 		continue;
@@ -137,7 +137,7 @@ void *clientburst(void *args){
 			perror("send");
 			continue;
 		}
-		cout << "Sent packet_num = " << i << endl;
+		// cout << "Sent packet_num = " << i << endl;
 	}
 
 	cout << "Done sending, yay :)\n";

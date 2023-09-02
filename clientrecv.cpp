@@ -31,7 +31,7 @@ void *updatin(void *args){
 
 	string reading = "";
 	struct updated *updating = (struct updated *)args;
-	ofstream fout("recv_log_" + to_string(updating->clientid) + ".txt");
+	// ofstream fout("recv_log_" + to_string(updating->clientid) + ".txt");
 	string temp1 = "ack";
 	const char *ack = temp1.c_str();
 	int sock = updating->socket;
@@ -52,8 +52,8 @@ void *updatin(void *args){
             }
         }
 		// reading = buff;
-		fout << "Buffer = " << buff << endl;
-		fout << "Reading = " << reading << endl;
+		// fout << "Buffer = " << buff << endl;
+		// fout << "Reading = " << reading << endl;
 		if (reading != ""){
 			int res = 0;
 			int i = 0;
@@ -75,14 +75,14 @@ void *updatin(void *args){
 			updating->needed_data->checkpoints[res] = 1;
 			updating->needed_data->broadcasted[res] = 1;
 			updating->needed_data->data[res] = resdata;
-			cout << "Received packet_num = " << res << endl;
+			// cout << "Received packet_num = " << res << endl;
 			send(updating->socket, ack, strlen(ack), 0);
 		}
 	}
 	int a = 2;
 	int *b = &a;
 	void *c = (void *)b;
-	fout.close();
+	// fout.close();
 	return c;
 }
 
