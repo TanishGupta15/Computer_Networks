@@ -87,6 +87,7 @@ void *clientburst(void *args){
 			cnt++;
 			needdata->data[line_num] = data;
 			needdata->received[line_num] = true;
+			needdata->broadcast.push(line_num);
 		}
 	}
 
