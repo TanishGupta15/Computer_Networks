@@ -69,11 +69,11 @@ void *p2p_broadcast(void *args){
             data->sent = true;
         }
     }
-    RETURN(0);
     #ifdef DEBUG
         // close file
         fout.close();
     #endif
+    RETURN(0);
 }
 
 void *clientbroadcast(void *args){
