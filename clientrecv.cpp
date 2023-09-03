@@ -85,11 +85,11 @@ void *p2p_recv(void *args){
 			send(data->socket, ack, strlen(ack), MSG_NOSIGNAL);
 		}
 	}
-	RETURN(0);
 	#ifdef DEBUG
 		// close file
 		fout.close();
 	#endif
+	RETURN(0);
 }
 
 void *clientrecv(void *args){
