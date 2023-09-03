@@ -16,7 +16,8 @@ struct Client_data{
     int port[N];
     const char *ips[N];
     // bool broadcasted[L];
-    queue<int> broadcast;
+    // queue<int> broadcast;
+    vector<int> broadcast;
     int clientid;
 };
 
@@ -26,6 +27,7 @@ struct P2P_connection{
     char *buffer;
     bool sent;
     int clientid;
+    int broadcast_idx;
 };
 
 void *p2p_broadcast(void *args){
@@ -34,7 +36,7 @@ void *p2p_broadcast(void *args){
         ofstream fout("send_log_" + to_string(data->clientid) + ".txt");
     #endif
     int sock = data->socket;
-    while (!data->needed_data->complete || !data->needed_data->broadcast.empty()){
+    while (!data->needed_data->complete || (data->broadcast_idx < (int)data->needed_data->broadcast.size())){
         if(data->sent){
             int val = recv(sock, data->buffer, BUFFER_SIZE, 0);
             if (val < 0){
@@ -49,9 +51,11 @@ void *p2p_broadcast(void *args){
                 data->sent = false;
             }
         }
-        if(!data->needed_data->broadcast.empty()){
-            int i = data->needed_data->broadcast.front();
-            data->needed_data->broadcast.pop();
+        if(data->broadcast_idx < (int)data->needed_data->broadcast.size()){
+            // int i = data->needed_data->broadcast.front();
+            // data->needed_data->broadcast.pop();
+            int i = data->needed_data->broadcast[data->broadcast_idx];
+            data->broadcast_idx++;
             string temp = to_string(i) + "\n" + data->needed_data->data[i];
             const char *temp1 = temp.c_str();
             #ifdef DEBUG
@@ -128,6 +132,7 @@ void *clientbroadcast(void *args){
             arguments[i].needed_data = needdata;
             arguments[i].sent = false;
             arguments[i].clientid = i;
+            arguments[i].broadcast_idx = 0;
             pthread_create(&broadcasters[i], NULL, p2p_broadcast, &arguments[i]);
         }
     }

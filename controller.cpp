@@ -11,7 +11,8 @@ struct Client_data{
 	int port[N];
 	const char *ips[N];
     // bool broadcasted[L];
-    queue<int> broadcast;
+    // queue<int> broadcast;
+    vector<int> broadcast;
     int clientid;
 };
 

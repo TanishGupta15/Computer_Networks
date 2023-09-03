@@ -14,7 +14,8 @@ struct Client_data{
  	int port[N];
 	const char *ips[N];
 	// bool broadcasted[L];
-	queue<int> broadcast;
+	// queue<int> broadcast;
+	vector<int> broadcast;
 	int clientid;
 };
 
@@ -87,7 +88,7 @@ void *clientburst(void *args){
 			cnt++;
 			needdata->data[line_num] = data;
 			needdata->received[line_num] = true;
-			needdata->broadcast.push(line_num);
+			needdata->broadcast.push_back(line_num);
 		}
 	}
 
