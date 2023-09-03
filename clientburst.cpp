@@ -13,7 +13,8 @@ struct Client_data{
     bool complete;
  	int port[N];
 	const char *ips[N];
-	bool broadcasted[L];
+	// bool broadcasted[L];
+	queue<int> broadcast;
 	int clientid;
 };
 
@@ -142,6 +143,9 @@ void *clientburst(void *args){
 		}
 	}
 	cout << reading << endl;
-	close(client_fd);
+	if(close(client_fd) < 0){
+		cout << "Unable to close the socket to the server\n";
+		perror("close");
+	}
 	RETURN(0);
 }

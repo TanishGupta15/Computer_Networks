@@ -15,7 +15,8 @@ struct Client_data{
     bool complete;
 	int port[N];
 	const char *ips[N];
-    bool broadcasted[L];
+    // bool broadcasted[L];
+    queue<int> broadcast;
     int clientid;
 };
 
@@ -26,7 +27,7 @@ void* client(void* arg){
     for (int i = 0; i < L; i++) {
         args->received[i] = false;
         args->data[i] = "0";
-        args->broadcasted[i] = false;
+        // args->broadcasted[i] = false;
     }
     args->complete = 0;
 

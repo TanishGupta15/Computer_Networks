@@ -16,7 +16,8 @@ struct Client_data {
 	bool complete;
 	int port[N];
 	const char *ips[N];
-	bool broadcasted[L];
+	// bool broadcasted[L];
+	queue<int> broadcast;
 	int clientid;
 };
 
@@ -75,7 +76,7 @@ void *p2p_recv(void *args){
 			if(!data->needed_data->received[line_num]){
 				data->needed_data->received[line_num] = true;
 				data->needed_data->data[line_num] = line_data;
-				data->needed_data->broadcasted[line_num] = true;
+				// data->needed_data->broadcasted[line_num] = true;
 			}
 			#ifdef DEBUG
 				fout << "Received line_num = " << line_num << endl;
@@ -158,6 +159,12 @@ void *clientrecv(void *args){
 	for (int i = 0; i < N; i++){
 		if (i != need_data->clientid)
 			pthread_join(updaters[i], NULL);
+	}
+
+	//Close all sockets
+	for (int i = 0; i < N; i++){
+		if (i != need_data->clientid)
+			close(receivers[i]);
 	}
 
 	RETURN(0);

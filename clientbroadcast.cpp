@@ -15,7 +15,8 @@ struct Client_data{
     bool complete;
     int port[N];
     const char *ips[N];
-    bool broadcasted[L];
+    // bool broadcasted[L];
+    queue<int> broadcast;
     int clientid;
 };
 
@@ -33,7 +34,7 @@ void *p2p_broadcast(void *args){
         ofstream fout("send_log_" + to_string(data->clientid) + ".txt");
     #endif
     int sock = data->socket;
-    while (!data->needed_data->complete){
+    while (!data->needed_data->complete || !data->needed_data->broadcast.empty()){
         if(data->sent){
             int val = recv(sock, data->buffer, BUFFER_SIZE, 0);
             if (val < 0){
@@ -48,18 +49,16 @@ void *p2p_broadcast(void *args){
                 data->sent = false;
             }
         }
-        for (int i = 0; i < L; i++){
-            if (!data->needed_data->broadcasted[i] && data->needed_data->received[i]){
-                data->needed_data->broadcasted[i] = true;
-                string temp = to_string(i) + "\n" + data->needed_data->data[i];
-                const char *temp1 = temp.c_str();
-                #ifdef DEBUG
-                    fout << "Sending: " << temp1 << endl;
-                #endif
-                send(sock, temp1, strlen(temp1), 0);
-                data->sent = true;
-                break;
-            }
+        if(!data->needed_data->broadcast.empty()){
+            int i = data->needed_data->broadcast.front();
+            data->needed_data->broadcast.pop();
+            string temp = to_string(i) + "\n" + data->needed_data->data[i];
+            const char *temp1 = temp.c_str();
+            #ifdef DEBUG
+                fout << "Sending: " << temp1 << endl;
+            #endif
+            send(sock, temp1, strlen(temp1), 0);
+            data->sent = true;
         }
     }
     RETURN(0);
@@ -136,5 +135,13 @@ void *clientbroadcast(void *args){
         if (i != needdata->clientid)
             pthread_join(broadcasters[i], NULL);
     }
+
+    for (int i = 0; i < N; i++){
+        if (i != needdata->clientid){
+            close(newsockets[i]);
+            close(listensockets[i]);
+        }
+    }
+
     RETURN(0);
 }
