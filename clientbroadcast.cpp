@@ -55,9 +55,13 @@ void *p2p_broadcast(void *args){
         if(data->broadcast_idx < (int)data->needed_data->broadcast.size()){
             // int i = data->needed_data->broadcast.front();
             // data->needed_data->broadcast.pop();
-            int i = data->needed_data->broadcast[data->broadcast_idx];
-            data->broadcast_idx++;
-            string temp = to_string(i) + "\n" + data->needed_data->data[i];
+            string temp = "";
+            while(data->broadcast_idx  < (int)data->needed_data->broadcast.size()){
+                int i = data->needed_data->broadcast[data->broadcast_idx];
+                data->broadcast_idx++;
+                temp += (to_string(i) + "\n" + data->needed_data->data[i]);
+            }
+            temp += "\n";
             const char *temp1 = temp.c_str();
             #ifdef DEBUG
                 fout << "Sending: " << temp1 << endl;
