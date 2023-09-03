@@ -42,7 +42,6 @@ void *p2p_recv(void *args){
 	char *buff = data->buffer;
 	while (!data->needed_data->complete){
 		int count = 0; //number of line breaks
-		// int countofdoubleslash = 0;
 		reading = "";
 		while(count < 2){
             int x = recv(sock, buff, BUFFER_SIZE, 0);
@@ -51,49 +50,39 @@ void *p2p_recv(void *args){
                 continue;
             }
             for(int i = 0; i < x; i++){
-                if(buff[i] == '\n') {
-					count++;
-				}
-				else{
-					count = 0;
-				}
+                if(buff[i] == '\n') count++;
                 reading += buff[i];
-                if(count == 2){
-					break;
-				}
+                if(count == 2) break;
             }
         }
 		#ifdef DEBUG
 			fout << "Received: " << reading << endl;
 			fout << "Buffer: " << buff << endl;
 		#endif
-
 		if (reading != ""){
+			int line_num = 0;
 			int i = 0;
-			while(i < (int)reading.size()-1){
-				int line_num = 0;
-				string line_data = "";
-				if(reading[i] == '-') continue; // Shouldn't happen
-				while (i < (int)reading.size()-1 && reading[i] != '\n'){
-					line_num = line_num * 10 + int(reading[i] - '0');
-					i++;
-				}
+			if(reading[0] == '-') continue; // Shouldn't happen
+			while (i < (int)reading.size() && reading[i] != '\n'){
+				line_num = line_num * 10 + int(reading[i] - '0');
 				i++;
-				while (i < (int)reading.size()-1 && reading[i] != '\n'){
-					line_data += reading[i];
-				}
-				line_data += "\n";
-				i++;
-				if(!data->needed_data->received[line_num]){
-					data->needed_data->received[line_num] = true;
-					data->needed_data->data[line_num] = line_data;
-				}
-			}	
+			}
+			i++;
+			string line_data = "";
+			for (int j = i; j < (int)reading.length(); j++){
+				line_data += reading[j];
+				if(reading[j] == '\n') break;
+			}
+
+			if(!data->needed_data->received[line_num]){
+				data->needed_data->received[line_num] = true;
+				data->needed_data->data[line_num] = line_data;
+				// data->needed_data->broadcasted[line_num] = true;
+			}
 			#ifdef DEBUG
 				fout << "Received line_num = " << line_num << endl;
 			#endif
 			send(data->socket, ack, strlen(ack), MSG_NOSIGNAL);
-
 		}
 	}
 	RETURN(0);
