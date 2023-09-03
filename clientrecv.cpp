@@ -82,7 +82,7 @@ void *p2p_recv(void *args){
 			#ifdef DEBUG
 				fout << "Received line_num = " << line_num << endl;
 			#endif
-			send(data->socket, ack, strlen(ack), 0);
+			send(data->socket, ack, strlen(ack), MSG_NOSIGNAL);
 		}
 	}
 	RETURN(0);

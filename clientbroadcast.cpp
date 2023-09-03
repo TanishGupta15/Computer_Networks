@@ -24,7 +24,7 @@ struct Client_data{
 struct P2P_connection{
     struct Client_data* needed_data;
     int socket;
-    char *buffer;
+    char* buffer;
     bool sent;
     int clientid;
     int broadcast_idx;
@@ -50,6 +50,7 @@ void *p2p_broadcast(void *args){
                 #endif
                 data->sent = false;
             }
+            else continue;
         }
         if(data->broadcast_idx < (int)data->needed_data->broadcast.size()){
             // int i = data->needed_data->broadcast.front();
@@ -61,7 +62,10 @@ void *p2p_broadcast(void *args){
             #ifdef DEBUG
                 fout << "Sending: " << temp1 << endl;
             #endif
-            send(sock, temp1, strlen(temp1), 0);
+            if(send(sock, temp1, strlen(temp1), MSG_NOSIGNAL) < 0){
+                perror("send");
+                continue;
+            }
             data->sent = true;
         }
     }
@@ -77,7 +81,7 @@ void *clientbroadcast(void *args){
     struct Client_data* needdata = (struct Client_data*) args;
     vector<int> listensockets(N);
     vector<int> newsockets(N);
-    vector<char *> buffers(N);
+    // vector<char *> buffers(N);
     vector<struct sockaddr_in> serveraddrs(N), newcleintaddrs(N);
     for (int i = 0; i < N; i++){
         if (i != needdata->clientid){
@@ -108,7 +112,7 @@ void *clientbroadcast(void *args){
                 exit(0);
             }
             cout << "Listening on port " << serveraddrs[i].sin_port << "\n";
-            buffers[i] = new char[BUFFER_SIZE]; //TODO: Need to deallocate this buffer
+            // buffers[i] = new char[BUFFER_SIZE]; //TODO: Need to deallocate this buffer
         }
     }
 
@@ -124,16 +128,17 @@ void *clientbroadcast(void *args){
     }
 
     vector<pthread_t> broadcasters(N);
-    vector<struct P2P_connection> arguments(N);
+    vector<struct P2P_connection*> arguments(N);
     for (int i = 0; i < N; i++){
         if (i != needdata->clientid){
-            arguments[i].buffer = buffers[i];
-            arguments[i].socket = newsockets[i];
-            arguments[i].needed_data = needdata;
-            arguments[i].sent = false;
-            arguments[i].clientid = i;
-            arguments[i].broadcast_idx = 0;
-            pthread_create(&broadcasters[i], NULL, p2p_broadcast, &arguments[i]);
+            arguments[i] = new struct P2P_connection;
+            arguments[i]->buffer = new char[BUFFER_SIZE];
+            arguments[i]->socket = newsockets[i];
+            arguments[i]->needed_data = needdata;
+            arguments[i]->sent = false;
+            arguments[i]->clientid = i;
+            arguments[i]->broadcast_idx = 0;
+            pthread_create(&broadcasters[i], NULL, p2p_broadcast, (void*)(arguments[i]));
         }
     }
     for (int i = 0; i < N; i++){
