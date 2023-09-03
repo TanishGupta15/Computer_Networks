@@ -1,11 +1,10 @@
-1. macros for return
-2. macros for person, personid
+1. macros for return -> Done
+2. macros for person, personid -> Done
 3. queue for sending packets
-4. ifdefs for debug
+4. ifdefs for debug  -> Done
 5. threads exit properly
 6. send even after having 1000 for self
-7. try without ack
+7. try without ack - special character?
+8. compile and run different in make -> Done
 
-
-Remove fout cout before submit
-
+Use while loop over send (needed if send < 0)

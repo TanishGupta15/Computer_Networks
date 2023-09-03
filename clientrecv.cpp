@@ -10,34 +10,36 @@
 using namespace std;
 
 //TODO: Change all these allocations on stack to heap
-struct mydata {
-	int checkpoints[L];
+struct Client_data {
+	bool received[L];
 	string data[L];
-	int complete;
+	bool complete;
 	int port[N];
 	const char *ips[N];
-	int broadcasted[L];
+	bool broadcasted[L];
 	int clientid;
 };
 
-struct updated {
-	struct mydata *needed_data;
+struct P2P_connection {
+	struct Client_data *needed_data;
 	int socket;
 	char *buffer;
 	int clientid;
 };
 
-void *updatin(void *args){
+void *p2p_recv(void *args){
 
 	string reading = "";
-	struct updated *updating = (struct updated *)args;
-	// ofstream fout("recv_log_" + to_string(updating->clientid) + ".txt");
+	struct P2P_connection *data = (struct P2P_connection *)args;
+	#ifdef DEBUG
+		ofstream fout("recv_log_" + to_string(data->clientid) + ".txt");
+	#endif
 	string temp1 = "ack";
 	const char *ack = temp1.c_str();
-	int sock = updating->socket;
-	char *buff = updating->buffer;
-	while (updating->needed_data->complete == 0){
-		int count = 0;
+	int sock = data->socket;
+	char *buff = data->buffer;
+	while (!data->needed_data->complete){
+		int count = 0; //number of line breaks
 		reading = "";
 		while(count < 2){
             int x = recv(sock, buff, BUFFER_SIZE, 0);
@@ -51,53 +53,52 @@ void *updatin(void *args){
                 if(count == 2) break;
             }
         }
-		// reading = buff;
-		// fout << "Buffer = " << buff << endl;
-		// fout << "Reading = " << reading << endl;
+		#ifdef DEBUG
+			fout << "Received: " << reading << endl;
+			fout << "Buffer: " << buff << endl;
+		#endif
 		if (reading != ""){
-			int res = 0;
+			int line_num = 0;
 			int i = 0;
 			if(reading[0] == '-') continue; // Shouldn't happen
-			// cout << "Reading " << reading << endl;
 			while (i < (int)reading.size() && reading[i] != '\n'){
-				res = res * 10 + int(reading[i] - '0');
+				line_num = line_num * 10 + int(reading[i] - '0');
 				i++;
 			}
 			i++;
-			string resdata = "";
+			string line_data = "";
 			for (int j = i; j < (int)reading.length(); j++){
-				resdata += reading[j];
+				line_data += reading[j];
 				if(reading[j] == '\n') break;
 			}
-			// if(res == -1)
-			// cout << "Res = " << res << endl;
-			//TODO: If res already exist, then don't update
-			updating->needed_data->checkpoints[res] = 1;
-			updating->needed_data->broadcasted[res] = 1;
-			updating->needed_data->data[res] = resdata;
-			// cout << "Received packet_num = " << res << endl;
-			send(updating->socket, ack, strlen(ack), 0);
+
+			if(!data->needed_data->received[line_num]){
+				data->needed_data->received[line_num] = true;
+				data->needed_data->data[line_num] = line_data;
+				data->needed_data->broadcasted[line_num] = true;
+			}
+			#ifdef DEBUG
+				fout << "Received line_num = " << line_num << endl;
+			#endif
+			send(data->socket, ack, strlen(ack), 0);
 		}
 	}
-	int a = 2;
-	int *b = &a;
-	void *c = (void *)b;
-	// fout.close();
-	return c;
+	RETURN(0);
+	#ifdef DEBUG
+		// close file
+		fout.close();
+	#endif
 }
 
-void *clientrecv(void *args)
-{
-	struct mydata *need_data = (struct mydata *)args;
+void *clientrecv(void *args){
+	struct Client_data *need_data = (struct Client_data*)args;
 
-	// int status, valread;
 	int status;
 	int receivers[N];
 
-	for (int i = 0; i < N; i++)
-		receivers[i] = 0;
+	for (int i = 0; i < N; i++) receivers[i] = 0;
 	vector<struct sockaddr_in> serv_addrs(N);
-	vector<char *> buffers;
+	vector<char *> buffers; //TODO: Need to deallocate this memory
 	for (int i = 0; i < N; i++){
 		char *buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
 		buffers.push_back(buffer);
@@ -106,36 +107,18 @@ void *clientrecv(void *args)
 		if (i != need_data->clientid){
 			if ((receivers[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 				printf("\n Socket creation error \n");
-				int a = 2;
-				int *b = &a;
-				void *c = (void *)b;
-				return c;
+				RETURN(2);
 			}
-
 			serv_addrs[i].sin_family = AF_INET;
-			cout << "For client " << need_data->clientid << " " << i << " " << PORTS + (i) * (N) + (need_data->clientid) << endl;
+			//TODO: Check port numbers once
 			serv_addrs[i].sin_port = (PORTS + (i) * (N) + (need_data->clientid));
 		}
 	}
 
 	for (int i = 0; i < N; i++){
 		if (i != need_data->clientid) {
-			// For now, just hardcoded, giving error;
-			string str = "127.0.0.1";
-			#ifndef SINGLE
-				if(i == 0)
-					str = IP0;
-				if(i == 1)
-					str = IP1;
-				else if(i == 2)
-					str = IP2;
-			#endif
-			const char* x = str.c_str();
-			if (inet_pton(AF_INET, x, &serv_addrs[i].sin_addr) <= 0){
-				int a = 2;
-				int *b = &a;
-				void *c = (void *)b;
-				return c;
+			if (inet_pton(AF_INET, client_ips[i], &serv_addrs[i].sin_addr) <= 0){
+				RETURN(2);
 			}
 		}
 	}
@@ -146,13 +129,10 @@ void *clientrecv(void *args)
 		for (int i = 0; i < N; i++){
 			if (i != need_data->clientid && !connected[i]){
 				cout << "Trying to connect " << serv_addrs[i].sin_port << endl;
-				if ((status = connect(receivers[i], (struct sockaddr *)&serv_addrs[i],
-									  sizeof(serv_addrs[i]))) < 0){
-					cout << "Trying again\n";
+				if ((status = connect(receivers[i], (struct sockaddr *)&serv_addrs[i], sizeof(serv_addrs[i]))) < 0){
+					cout << "Couldn't connect. Trying again...\n";
 					perror("connect");
-					// exit(0);
 					continue;
-					// connectionchk = 0;
 				}
 				else{
 					connected[i] = true;
@@ -165,14 +145,14 @@ void *clientrecv(void *args)
 	cout << "Connected yay :)\n";
 
 	vector<pthread_t> updaters(N);
-	vector<struct updated> arguments(N);
+	vector<struct P2P_connection> arguments(N);
 	for (int i = 0; i < N; i++){
 		if (i != need_data->clientid){
 			arguments[i].socket = receivers[i];
 			arguments[i].buffer = buffers[i];
 			arguments[i].needed_data = need_data;
 			arguments[i].clientid = i;
-			pthread_create(&updaters[i], NULL, updatin, &arguments[i]);
+			pthread_create(&updaters[i], NULL, p2p_recv, &arguments[i]);
 		}
 	}
 	for (int i = 0; i < N; i++){
@@ -180,8 +160,5 @@ void *clientrecv(void *args)
 			pthread_join(updaters[i], NULL);
 	}
 
-	int a = 2;
-	int *b = &a;
-	void *c = (void *)b;
-	return c;
+	RETURN(0);
 }

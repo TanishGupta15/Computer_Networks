@@ -1,6 +1,9 @@
 all:
-	g++ -Wall controller.cpp client.cpp clientburst.cpp clientrecv.cpp clientbroadcast.cpp driver.cpp -pthread -o client
+	g++ controller.cpp client.cpp clientburst.cpp clientrecv.cpp clientbroadcast.cpp driver.cpp -pthread -o client
 	./client
+
+compile:
+	g++ controller.cpp client.cpp clientburst.cpp clientrecv.cpp clientbroadcast.cpp driver.cpp -pthread -o client
 
 clean:
 	rm -rf client

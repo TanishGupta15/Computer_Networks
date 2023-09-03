@@ -9,92 +9,69 @@
 #include <fstream>
 using namespace std;
 
-struct mydata{
-    int checkpoints[L];
+struct Client_data{
+    bool received[L];
     string data[L];
-    int complete;
+    bool complete;
     int port[N];
     const char *ips[N];
-    int broadcasted[L];
+    bool broadcasted[L];
     int clientid;
 };
 
-struct updated{
-    struct mydata *neededdata;
+struct P2P_connection{
+    struct Client_data* needed_data;
     int socket;
     char *buffer;
-    int start;
+    bool sent;
     int clientid;
 };
 
-void *updating(void *args){
-    struct updated *updating = (struct updated *)args;
-    // ofstream fout("send_log_" + to_string(updating->clientid) + ".txt");
-    int sock = updating->socket;
-    updating->buffer = new char[BUFFER_SIZE];
-    // bool sent = false;
-    while (updating->neededdata->complete == 0){
-        // cout << "updating->start = " << updating->start << endl;
-        if (updating->start == 1){
-            // fout << "Inside updating->start = 1" << endl;
-            for (int i = 0; i < L; i++){
-                if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
-                    updating->neededdata->broadcasted[i] = 1;
-                    string temp = to_string(i) + "\n" + updating->neededdata->data[i]; //Aldready included the linebreak in the data
-                    const char *temp1 = temp.c_str();
-                    // fout << temp1 << endl;
-                    send(sock, temp1, strlen(temp1), 0);
-                    // sent = true;
-                    updating->start = 0;
-                    // fout << "updating->start set to 0" << endl;
-                    break;
-                }
-            }
-        }
-        else{
-            // fout << "Inside updating->startv = 0" << endl;
-            int val = recv(sock, updating->buffer, BUFFER_SIZE, 0);
+void *p2p_broadcast(void *args){
+    struct P2P_connection* data = (struct P2P_connection*) args;
+    #ifdef DEBUG
+        ofstream fout("send_log_" + to_string(data->clientid) + ".txt");
+    #endif
+    int sock = data->socket;
+    while (!data->needed_data->complete){
+        if(data->sent){
+            int val = recv(sock, data->buffer, BUFFER_SIZE, 0);
             if (val < 0){
                 perror("read");
                 continue;
             }
-            string reading = updating->buffer;
-            // fout << "Reading in broadcast " << reading << endl;
-            if (reading == "ack"){
-                // cout << "Received ack\n";
-                // fout << "Received ack" << endl;
-                updating->start = 1;
-                // fout << "updating->start set to 1" << endl;
-                for (int i = 0; i < L; i++){
-                    if (updating->neededdata->broadcasted[i] == 0 && updating->neededdata->checkpoints[i] == 1){
-                        updating->neededdata->broadcasted[i] = 1;
-                        string temp = to_string(i) + "\n" + updating->neededdata->data[i];
-                        const char *temp1 = temp.c_str();
-                        // fout << temp1 << endl;
-                        send(sock, temp1, strlen(temp1), 0);
-                        updating->start = 0;
-                        // fout << "updating->start set to 0" << endl;
-                        break;
-                    }
-                }
+            string reading = data->buffer;
+            if(reading == "ack"){
+                #ifdef DEBUG
+                    fout << "Received ack" << endl;
+                #endif
+                data->sent = false;
             }
-            // clear buffer
-            // for (int i = 0; i < BUFFER_SIZE; i++){
-            //     updating->buffer[i] = '\0';
-            // }
+        }
+        for (int i = 0; i < L; i++){
+            if (!data->needed_data->broadcasted[i] && data->needed_data->received[i]){
+                data->needed_data->broadcasted[i] = true;
+                string temp = to_string(i) + "\n" + data->needed_data->data[i];
+                const char *temp1 = temp.c_str();
+                #ifdef DEBUG
+                    fout << "Sending: " << temp1 << endl;
+                #endif
+                send(sock, temp1, strlen(temp1), 0);
+                data->sent = true;
+                break;
+            }
         }
     }
-    int a = 2;
-    int *b = &a;
-    void *c = (void *)b;
-    // close file
-    // fout.close();
-    return c;
+    RETURN(0);
+    #ifdef DEBUG
+        // close file
+        fout.close();
+    #endif
 }
 
 void *clientbroadcast(void *args){
 
-    struct mydata *needdata = (struct mydata *)args;
+    struct Client_data* needdata = (struct Client_data*) args;
     vector<int> listensockets(N);
     vector<int> newsockets(N);
     vector<char *> buffers(N);
@@ -114,7 +91,7 @@ void *clientbroadcast(void *args){
             int reuse = 1;
             if (setsockopt(listensockets[i], SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1) {
                 perror("setsockopt");
-                // Handle error
+                //TODO: Handle error
             }
 
             if(bind(listensockets[i], (struct sockaddr *)&serveraddrs[i], sizeof(serveraddrs[i])) < 0){
@@ -128,6 +105,7 @@ void *clientbroadcast(void *args){
                 exit(0);
             }
             cout << "Listening on port " << serveraddrs[i].sin_port << "\n";
+            buffers[i] = new char[BUFFER_SIZE]; //TODO: Need to deallocate this buffer
         }
     }
 
@@ -142,25 +120,21 @@ void *clientbroadcast(void *args){
         }
     }
 
-    // cout << "Connected\n";
     vector<pthread_t> broadcasters(N);
-    vector<struct updated> arguments(N);
+    vector<struct P2P_connection> arguments(N);
     for (int i = 0; i < N; i++){
         if (i != needdata->clientid){
             arguments[i].buffer = buffers[i];
             arguments[i].socket = newsockets[i];
-            arguments[i].neededdata = needdata;
-            arguments[i].start = 1;
+            arguments[i].needed_data = needdata;
+            arguments[i].sent = false;
             arguments[i].clientid = i;
-            pthread_create(&broadcasters[i], NULL, updating, &arguments[i]);
+            pthread_create(&broadcasters[i], NULL, p2p_broadcast, &arguments[i]);
         }
     }
     for (int i = 0; i < N; i++){
         if (i != needdata->clientid)
             pthread_join(broadcasters[i], NULL);
     }
-    int a = 2;
-    int *b = &a;
-    void *c = (void *)b;
-    return c;
+    RETURN(0);
 }

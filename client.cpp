@@ -9,24 +9,24 @@ extern void* clientrecv(void *args);
 extern void* controller(void *args);
 extern void* clientbroadcast(void *args);
 
-struct mydata{
-    int checkpoints[L];
+struct Client_data{
+    bool received[L];
     string data[L];
-    int complete;
+    bool complete;
 	int port[N];
 	const char *ips[N];
-    int broadcasted[L];
+    bool broadcasted[L];
     int clientid;
 };
 
 void* client(void* arg){
     
-    struct mydata* args = (struct mydata*) arg;
+    struct Client_data* args = (struct Client_data*) arg;
     pthread_t clientburster, clientrecver, clientcontroller, clientbroadcaster;
     for (int i = 0; i < L; i++) {
-        args->checkpoints[i] = 0;
+        args->received[i] = false;
         args->data[i] = "0";
-        args->broadcasted[i] = 0;
+        args->broadcasted[i] = false;
     }
     args->complete = 0;
 
@@ -41,9 +41,5 @@ void* client(void* arg){
     pthread_join(clientcontroller, NULL);
 
     printf("\nCompleted File transfer\n");
-
-	int a = 2;
-	int *b = &a;
-	void *c = (void *)b;
-	return c;
+	RETURN(0);
 }

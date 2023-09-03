@@ -3,43 +3,38 @@
 #include <bits/stdc++.h>
 #include "constants.h"
 using namespace std;
-struct mydata{
-    int checkpoints[L];
+
+struct Client_data{
+    bool received[L];
     string data[L];
-    int complete;
+    bool complete;
 	int port[N];
 	const char *ips[N];
-    int broadcasted[L];
+    bool broadcasted[L];
     int clientid;
 };
 
-//TODO: Log data to some file to draw graphs
+//TODO: Log data to some file to draw plots
 void *controller(void *args) {
-    struct mydata* mydat = (struct mydata*) args;
+    struct Client_data* data = (struct Client_data*) args;
     bool printed = false;
-    while (mydat->complete == 0) {
-        int chk = 1, cnt = 0;
+    while (data->complete == false) {
+        int received_cnt = 0;
         for (int i = 0; i < L; i++){
-            if (mydat->checkpoints[i] == 0){
-                chk = 0;
-                // break;
+            if (data->received[i]){
+                received_cnt++;
             }
-            else cnt++;
         }
-        if (chk == 1){
-            mydat->complete = 1;
+        if (received_cnt == L){
+            data->complete = true;
         }
-        if(cnt % 100 == 0){
+        if(received_cnt % 100 == 0){
             if(!printed){
-                cout << "Received " << cnt << " packets\n";
+                cout << "Received " << received_cnt << " lines\n";
                 printed = true;
             }
         }
         else printed = false;
-            // cout << "Received " << cnt << " packets\n";
     }
-    int a = 2;
-    int *b = &a;
-    void *c = (void *)b;
-    return c;
+    RETURN(0);
 }
