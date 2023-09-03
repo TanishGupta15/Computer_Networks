@@ -46,7 +46,6 @@ void *clientburst(void *args){
 	}
 
 	int cnt = 0;
-
 	while (!needdata->complete) {
 		if(send(client_fd, sendline, strlen(sendline), 0) < 0){
 			perror("send");
@@ -86,13 +85,14 @@ void *clientburst(void *args){
 				if(mystring[j] == '\n') break;
 			}
 			cnt++;
+			// cout << line_num << endl;
 			needdata->data[line_num] = data;
 			needdata->received[line_num] = true;
 			needdata->broadcast.push_back(line_num);
 		}
 	}
 
-	cout << "Received: \n" << cnt << " lines from server\n" << L - cnt << " lines from other clients\n";
+	// cout << "Received: \n" << cnt << " lines from server\n" << L - cnt << " lines from other clients\n";
 
 	const char* submit = "SUBMIT\n";
 	while(send(client_fd, submit, strlen(submit), 0) < 0){

@@ -56,10 +56,13 @@ void *p2p_broadcast(void *args){
             // int i = data->needed_data->broadcast.front();
             // data->needed_data->broadcast.pop();
             string temp = "";
-            while(data->broadcast_idx  < (int)data->needed_data->broadcast.size()){
+            // int upperboundcount = 0;
+            int lengthofvector = data->needed_data->broadcast.size();
+            while(data->broadcast_idx  < lengthofvector){
                 int i = data->needed_data->broadcast[data->broadcast_idx];
                 data->broadcast_idx++;
                 temp += (to_string(i) + "\n" + data->needed_data->data[i]);
+                // upperboundcount++;
             }
             temp += "\n";
             const char *temp1 = temp.c_str();

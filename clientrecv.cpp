@@ -81,6 +81,7 @@ void *p2p_recv(void *args){
 				i++;
 				while (i < (int)reading.size()-1 && reading[i] != '\n'){
 					line_data += reading[i];
+					i++;
 				}
 				line_data += "\n";
 				i++;
@@ -89,10 +90,11 @@ void *p2p_recv(void *args){
 					data->needed_data->data[line_num] = line_data;
 
 				}
+				// cout << line_num << endl;
+				#ifdef DEBUG
+					fout << "Received line_num = " << line_num << endl;
+				#endif
 			}	
-			#ifdef DEBUG
-				fout << "Received line_num = " << line_num << endl;
-			#endif
 			send(data->socket, ack, strlen(ack), MSG_NOSIGNAL);
 
 		}
