@@ -48,7 +48,7 @@ bottom=10mm,
     \hrule
 }
 }
-\section{Implementation C++ (g++ 10.4)}
+\section{Implementation Cpp (g++ 10.4)}
 \begin{enumerate}
     \item \textbf{clientburst.cpp}\\
     This file contains the code logic for receving packets continuously from the server.
@@ -215,12 +215,72 @@ This thread will continuously check whether the client has received all the pack
 
 \textbf{5. Clientrecv.cpp}\\
 \textbf{Logic : }
-\par Every client will create a socket and bind it to its port. Then it will start receiving for the packets from its peer clients. When it receives the packets, it will parse the data and store it in its data array. It will also update the checkpoint array. The data which would received from the peer client would be in the form of "(line\textbackslash nnumber data)...(line\textbackslash nnumber data)".\\
-\textbf{5.1 Creation and Binding of Socket}
-\par For every client, we will have N sockets which will try to connect their peer clients. The port number of the socket to which it will try to connect will be the func(client id of peer). We will maintain a vector of sockets which will be used to connect to the peer clients.\\
+\par Every client will create a socket and bind it to its port. Then it will start receiving for the packets from its peer clients. When it receives the packets, it will parse the data and store it in its data array. It will also update the checkpoint array. The data which would received from the peer client would be in the form of "(line\textbackslash nnumber data)...(line\textbackslash nnumber data)".\\ For every client, we will have N sockets which will try to connect their peer clients. The port number of the socket to which it will try to connect will be the func(client id of peer). We will maintain a vector of sockets which will be used to connect to the peer clients.\\
+\par As the data received from peer is of the complex form, cleintrecv will try to convert it into the form of "line\textbackslash ndata".\\\\
+\textbf{Converting Data into the required form}
+\begin{verbatim}
+    reading = "";
+    while(count < 2){
+        int x = recv(sock, buff, BUFFER_SIZE, 0);
+        if(x < 0){
+            perror("recv");
+            continue;
+        }
+        for(int i = 0; i < x; i++){
+            if(buff[i] == '\n') {
+                count++;
+            }
+            else{
+                count = 0;
+            }
+            reading += buff[i];
+            if(count == 2){
+                break;
+            }
+        }
+    }
+\end{verbatim}
+\par We are creating a string reading. We will keep on appending the data to the string reading. When we encounter two consecutive new lines, we will break the loop. It is assumed that the other peers will send the data with appending one extra $\backslash$ n at the end.\\
+We know that the underlying protocol TCP is reliable but it uses streams. Hence it could happen that data writtem in kernel socket file is not complete and received in chunks. So to assure that we had recevied all the data, we will keep writing on the client buffer until we encounter two consecutive new lines.\\
+Data is parsed in the same way as it was done in clientburst.\\
 
+\textbf{6. Clientbroadcast.cpp}\\
+\textbf{Logic : }
+\par We have created a queue of lines which are yet to be broadcasted. Whenever we will see that the queue is empty we will record the length of queue at that time. To achieve the functionality of iterating over queue, we have implemented it using a C++ vector. We will iterate over the queue till the length we saw and create a string temp which will contain the data in the form of "line\textbackslash ndata....line\textbackslash ndata". We will then broadcast this data to all the peer clients.\\
+\begin{verbatim}
+    if(data->broadcast_idx < (int)data->needed_data->broadcast.size()){
+        string temp = "";
+        int lengthofvector = data->needed_data->broadcast.size();
+        while(data->broadcast_idx  < lengthofvector){
+            int i = data->needed_data->broadcast[data->broadcast_idx];
+            data->broadcast_idx++;
+            temp += (to_string(i) + "\n" + data->needed_data->data[i]);
+            // upperboundcount++;
+        }
+        temp += "\n";
+        const char *temp1 = temp.c_str();
+        if(send(sock, temp1, strlen(temp1), MSG_NOSIGNAL) < 0){
+            perror("send");
+            continue;
+        }
+        data->sent = true;
+    }
+\end{verbatim}
 
+\textbf{7. Calculating the peer ports}\\
+\par Every client will create N sockets. One socket will always be empty. All the other sockets would be to send the data to other cleints.\\
+\par The ports of the sockets would be calculated as follows :\\  $PORTS + (needdata->clientid) * (N) + (i)$;\\
+\par Every cleint will connect to the ports :\\ $(PORTS + (i) * (N) + (need\_data->clientid))$;\\
+\par This will ensure that every client will connect to every other client.\\
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Screenshot from 2023-09-05 11-44-09.png}
+    \caption{Client 1 and Client 2 Connections}
+    \label{fig:my_label}
+\end{figure}
+
+\par The figure show that how Client 1 and Client 2 are connected from all the other peers.\\
 
 \subsection{Fault Recovery and Consistency}
 \section{Analysis}

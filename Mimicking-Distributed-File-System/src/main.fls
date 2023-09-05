@@ -1,10 +1,10 @@
-PWD /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks
+PWD /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src
 INPUT /etc/texmf/web2c/texmf.cnf
 INPUT /usr/share/texmf/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/main.tex
-OUTPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/main.log
+INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.tex
+OUTPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.log
 INPUT /usr/share/texlive/texmf-dist/tex/latex/koma-script/scrartcl.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/koma-script/scrartcl.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/koma-script/scrkbase.sty
@@ -204,9 +204,9 @@ INPUT /usr/share/texlive/texmf-dist/tex/generic/iftex/ifvtex.sty
 INPUT /usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
 INPUT /usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr17.tfm
-INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/main.aux
-INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/main.aux
-OUTPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/main.aux
+INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.aux
+INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.aux
+OUTPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.aux
 INPUT /usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
@@ -257,12 +257,16 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmssbx10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmssbx10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmssbx10.tfm
-OUTPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/main.pdf
+OUTPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.pdf
 INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
-INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/main.aux
+INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/images/Screenshot from 2023-09-05 11-44-09.png
+INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/images/Screenshot from 2023-09-05 11-44-09.png
+INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/images/Screenshot from 2023-09-05 11-44-09.png
+INPUT /home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.aux
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
