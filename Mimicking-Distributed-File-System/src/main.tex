@@ -69,6 +69,41 @@ bottom=10mm,
 
 
 \subsection{Code Structure}
+\begin{center}
+\begin{tikzpicture}
+    % Draw central server
+    \node[draw, circle, text width=1.5cm, align=center] (server) at (8, 0) {Server};
+    
+    % Draw nodes
+    \node[draw, circle, text width=1.5cm, align=center] (node1) at (-3, 2) {Node 1};
+    \node[draw, circle, text width=1.5cm, align=center] (node2) at (3, 2) {Node 2};
+    \node[draw, circle, text width=1.5cm, align=center] (node3) at (-3, -2) {Node 3};
+    \node[draw, circle, text width=1.5cm, align=center] (node4) at (3, -2) {Node 4};
+    
+    % Draw communication lines
+    \draw[<->] (node1) -- (server);
+    \draw[<->] (node2) -- (server);
+    \draw[<->] (node3) -- (server);
+    \draw[<->] (node4) -- (server);
+    
+    \draw[<->] (node1) -- (node2);
+    \draw[<->] (node1) -- (node3);
+    \draw[<->] (node1) -- (node4);
+    
+    \draw[<->] (node2) -- (node1);
+    \draw[<->] (node2) -- (node3);
+    \draw[<->] (node2) -- (node4);
+    
+    \draw[<->] (node3) -- (node1);
+    \draw[<->] (node3) -- (node2);
+    \draw[<->] (node3) -- (node4);
+    
+    \draw[<->] (node4) -- (node1);
+    \draw[<->] (node4) -- (node2);
+    \draw[<->] (node4) -- (node3);
+\end{tikzpicture}
+\end{center}
+
 % \subsubsection{Central Struct : "Client_data"}
 \textbf{1. Central Struct : "Client\_data"}\\
 This struct contains all the data that is required for the client to communicate with peers.\\

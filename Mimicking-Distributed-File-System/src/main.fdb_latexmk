@@ -1,8 +1,8 @@
 # Fdb version 3
-["pdflatex"] 1693894719 "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.tex" "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.pdf" "main" 1693894720
+["pdflatex"] 1693979199 "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.tex" "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.pdf" "main" 1693979200
   "/etc/texmf/web2c/texmf.cnf" 1679215609 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.aux" 1693894720 1234 ac73d6eab90432dbfbcb3f50996f74cd ""
-  "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.tex" 1693894719 11440 faab9dca0c5df075dad0417aebcd88db ""
+  "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.aux" 1693979200 1234 ac73d6eab90432dbfbcb3f50996f74cd ""
+  "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.tex" 1693979199 12600 963b563f5ecded3a4625c354104dc80d ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy8.tfm" 1246382020 1120 200be8b775682cdf80acad4be5ef57e4 ""
@@ -170,11 +170,11 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1691463755 4770781 1ed1abab22da9c3e2cc82e4db562318b ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1691463773 8260934 05e57098b5bc0d39a4b1a3bda5c12c71 ""
   "images/Screenshot from 2023-09-05 11-44-09.png" 1693894454 108965 fd1c63a330fe2a1656c6e74186506bcf ""
-  "main.aux" 1693894720 1234 ac73d6eab90432dbfbcb3f50996f74cd "pdflatex"
-  "main.tex" 1693894719 11440 faab9dca0c5df075dad0417aebcd88db ""
+  "main.aux" 1693979200 1234 ac73d6eab90432dbfbcb3f50996f74cd "pdflatex"
+  "main.tex" 1693979199 12600 963b563f5ecded3a4625c354104dc80d ""
   (generated)
   "main.aux"
+  "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.log"
   "main.pdf"
   "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.pdf"
   "main.log"
-  "/home/vatsal/SEM-7/COL334/FINAL-COMPUTER_NETWORKS/Computer_Networks/Mimicking-Distributed-File-System/src/main.log"
