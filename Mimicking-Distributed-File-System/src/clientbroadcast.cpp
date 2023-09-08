@@ -86,7 +86,6 @@ void *clientbroadcast(void *args){
     struct Client_data* needdata = (struct Client_data*) args;
     vector<int> listensockets(N);
     vector<int> newsockets(N);
-    // vector<char *> buffers(N);
     vector<struct sockaddr_in> serveraddrs(N), newcleintaddrs(N);
     for (int i = 0; i < N; i++){
         if (i != needdata->clientid){
@@ -103,7 +102,7 @@ void *clientbroadcast(void *args){
             int reuse = 1;
             if (setsockopt(listensockets[i], SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1) {
                 perror("setsockopt");
-                //TODO: Handle error
+                exit(0);
             }
 
             if(bind(listensockets[i], (struct sockaddr *)&serveraddrs[i], sizeof(serveraddrs[i])) < 0){
@@ -117,7 +116,6 @@ void *clientbroadcast(void *args){
                 exit(0);
             }
             cout << "Listening on port " << serveraddrs[i].sin_port << "\n";
-            // buffers[i] = new char[BUFFER_SIZE]; //TODO: Need to deallocate this buffer
         }
     }
 
@@ -153,8 +151,22 @@ void *clientbroadcast(void *args){
 
     for (int i = 0; i < N; i++){
         if (i != needdata->clientid){
-            close(newsockets[i]);
-            close(listensockets[i]);
+            while(close(newsockets[i]) < 0){
+                perror("close newsockets");
+                continue;
+            }
+            while(close(listensockets[i]) < 0){
+                perror("close listensockets");
+                continue;
+            }
+        }
+    }
+
+    // deallocate memory
+    for (int i = 0; i < N; i++){
+        if (i != needdata->clientid){
+            delete[] arguments[i]->buffer;
+            delete arguments[i];
         }
     }
 

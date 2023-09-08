@@ -28,11 +28,9 @@ def plot_graph(data_file):
 
 if __name__ == "__main__":
     # python3 plot.py <data_file>
-    # get the file in the parent directory
-    # data_file = "../logs/plot_data.csv"
-    # give absolute path using os
-    # data_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'logs', 'plot_data.csv'))
-
+    if len(sys.argv) != 2:
+        print("Usage: python3 plot.py <data_file>")
+        exit(1)
     print("Plotting graph between number of lines received and time taken")
     print("Reading data from file: ", sys.argv[1], flush=True)
     plot_graph(sys.argv[1])

@@ -111,7 +111,7 @@ void *clientrecv(void *args){
 
 	for (int i = 0; i < N; i++) receivers[i] = 0;
 	vector<struct sockaddr_in> serv_addrs(N);
-	vector<char *> buffers; //TODO: Need to deallocate this memory
+	vector<char *> buffers;
 	for (int i = 0; i < N; i++){
 		char *buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
 		buffers.push_back(buffer);
@@ -123,7 +123,6 @@ void *clientrecv(void *args){
 				RETURN(2);
 			}
 			serv_addrs[i].sin_family = AF_INET;
-			//TODO: Check port numbers once
 			serv_addrs[i].sin_port = (PORTS + (i) * (N) + (need_data->clientid));
 		}
 	}
@@ -176,7 +175,16 @@ void *clientrecv(void *args){
 	//Close all sockets
 	for (int i = 0; i < N; i++){
 		if (i != need_data->clientid)
-			close(receivers[i]);
+			while(close(receivers[i]) < 0){
+				perror(("close " + to_string(i)).c_str());
+				continue;
+			}
+	}
+
+	//delete all buffers
+	for (int i = 0; i < N; i++){
+		if (i != need_data->clientid)
+			delete[] buffers[i];
 	}
 
 	RETURN(0);

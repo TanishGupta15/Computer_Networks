@@ -14,7 +14,6 @@ struct Client_data{
     int clientid;
 };
 
-//TODO: Log data to some file to draw plots
 void *controller(void *args) {
     struct Client_data* data = (struct Client_data*) args;
     bool printed = false;
