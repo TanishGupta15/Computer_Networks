@@ -48,23 +48,26 @@ bottom=10mm,
     \hrule
 }
 }
-\section{Implementation Cpp (g++ 10.4)}
+
+\section{Introduction}
+
+As a part of this assignment, we learnt about socket programming using TCP. We exploited the mesh network structure (since there were only 4 clients), each client running 4 threads - 1 connecting it to the server, and the remaining 3 for P2P connections. In the remainder of this document, we first describe the different modules of our code structure, and then look into each one deeply using its C++ implementation. We include relevant details and the logic along with different code segments. Finally, we present some analysis reports.
+
+\section{Implementation in C++ (g++ 10.4)}
 \begin{enumerate}
     \item \textbf{clientburst.cpp}\\
-    This file contains the code logic for receving packets continuously from the server.
+    This file contains the code logic for receiving packets continuously from the server.
     \item \textbf{clientrecv.cpp}\\
-    Client will receive the packets continuously from its peer cleint.
-    \item \textbf{cleintbroadcast.cpp}\\
+    Client will receive the packets continuously from its peer client (P2P connections). Recall that all these connections (and the one with server) run on different ports with the help of different threads.
+    \item \textbf{clientbroadcast.cpp}\\
     Client will broadcast the packets to its peer clients continuously.
     \item \textbf{controller.cpp}\\
-    Every client will keep count of how much lines it has received. When it is L = 1000, it will communicate it with the main thread.
+    Controls the logic of the client. It can be thought of as an entity that binds together different threads. For example, Every client will keep count of how many lines it has received. When it is L = 1000, it will communicate it with the main thread.
     \item \textbf{driver.cpp}\\
-    Every client can run this file with their respective ip written in constants.h.
+    Specific implementation is included in subsequent sections. In short, Every client can run this file with their respective IP addresses (which have been defined in constants.h header file to maintain modularity).
     \item \textbf{constants.h}\\
-    All the constants like Number of cleints, port number, ip address of clients are written here.
+    All the constants including Number of clients, Port Numbers, IP Addresses of clients are defined here.
 \end{enumerate}
-
-
 
 
 
@@ -106,7 +109,7 @@ bottom=10mm,
 
 % \subsubsection{Central Struct : "Client_data"}
 \textbf{1. Central Struct : "Client\_data"}\\
-This struct contains all the data that is required for the client to communicate with peers.\\
+This struct contains all the data that is required for the client to communicate with peers. This is the common data structure that is shared among all the threads of a single client. It contains all the logic - including receiving lines and communicating them to other peers. \\
 \begin{verbatim}
     struct Client_data{
         bool received[L];
@@ -119,13 +122,13 @@ This struct contains all the data that is required for the client to communicate
     };
 \end{verbatim}
 \begin{itemize}
-    \item \textbf{received[L]} : This array contains the information about which lines have been received.
+    \item \textbf{received[L]} : This array contains the information about which lines have been received (both from the server and other clients). Here, L is the total number of lines which has been predefined in the constants.h file. 
     \item \textbf{data[L]} : This array contains the data of the lines that have been received.
-    \item \textbf{complete} : This variable tells whether the client has received all the lines or not.
-    \item \textbf{port[N]} : This array contains the port numbers of the peers.
-    \item \textbf{ips[N]} : This array contains the ip addresses of the peers.
-    \item \textbf{broadcast} : This vector contains the information which line is yet to be broadcasted.
-    \item \textbf{clientid} : This variable contains the id of the client. 
+    \item \textbf{complete} : This variable tells whether the client has received all the lines or not. Precisely, "complete" is true if and only if all elements of "received" array are true.
+    \item \textbf{port[N]} : This array contains the port numbers of the peers (the port where we need to send the line).
+    \item \textbf{ips[N]} : This array contains the IP addresses of the peers.
+    \item \textbf{broadcast} : This vector contains the information about which lines are yet to be broadcasted. Initially, "broadcast" was a boolean array which held the information about each line if it was broadcasted yet or not. As the part of an optimzation, we now only push those line numbers to this vector, which are to be sent next. (Note that, this is similar to a queue, but NOT a queue. Since different threads need to cooperate and send the data to different clients at different speeds, we can not pop from the queue. Thus, we maintain a separate index for each P2P connection - which contains the index upto which the data has been sent).
+    \item \textbf{clientid} : This variable contains the id of "this" client - Every client is assigned a unique ID.
 \end{itemize}
 
 \textbf{2. Driver.cpp}\\
@@ -147,25 +150,29 @@ This struct contains all the data that is required for the client to communicate
         return 0;
     }
 \end{verbatim}
-This file is driver for starting the cleint. It creates a thread with certain parameters like client id and ip address.\\
+This file is the driver for starting the client. It calls the client function with certain parameters including client ID and IP address. (Notice that the client\_ips array is defined in the constants.h file)\\
 \\
 \textbf{3. Client.cpp}\\
+
+This file is the first entry point for each client. There are a number of steps that need to be performed here.
+
 \textbf{3.1 Client Data Initialization}
 \begin{verbatim}
     void* client(void* arg){
         struct Client_data* args = (struct Client_data*) arg;
-        pthread_t clientburster, clientrecver, clientcontroller, clientbroadcaster;
         for (int i = 0; i < L; i++) {
             args->received[i] = false;
             args->data[i] = "0";
-            // args->broadcasted[i] = false;
         }
         args->complete = 0;
     }
 \end{verbatim}
-All the cleints will initialize their data and checkpoint array. And they will set the complete variable to 0.\\
-\textbf{3.2 Cleint Sub modules}:
+All the clients will initialize their struct attributes including received array and data array. Each client will also set the "complete" variable to false.\\
+
+\textbf{3.2 Client Sub modules}:
 \begin{verbatim}
+    pthread_t clientburster, clientrecver, clientcontroller, clientbroadcaster;
+    
     pthread_create(&clientburster, NULL, clientburst, (void*) &(*args));
     pthread_create(&clientrecver, NULL, clientrecv, (void*) &(*args));
     pthread_create(&clientbroadcaster, NULL, clientbroadcast, (void*) &(*args));
@@ -176,18 +183,28 @@ All the cleints will initialize their data and checkpoint array. And they will s
     pthread_join(clientbroadcaster, NULL);
     pthread_join(clientcontroller, NULL);
 \end{verbatim}
-This file creates 4 submodules for the client.
+This file creates 4 submodules for the client i.e. runs 4 different functionalities on 4 different threads. \\
+
 \textbf{3.2.1 Clientburst}\\
 This thread will continuously receive the packets from the server.\\
+
 \textbf{3.2.2 Clientrecv}\\
 This thread will continuously receive the packets from the peer client.\\
+
 \textbf{3.2.3 Clientbroadcast}\\
 This thread will continuously broadcast the packets to the peer clients.\\
+
 \textbf{3.2.4 Controller}\\
-This thread will continuously check whether the client has received all the packets or not.
-\\
+This thread will continuously check whether the client has received all the packets or not, and perform overall control functions.\\
+
 \textbf{4. Clientburst.cpp}\\
+
+The crux of this file, as mentioned before, is to continously receive data from the server. \\
+
 \textbf{4.1 Creation and Connecting Socket with Server}
+
+The following is some boilerplate code needed to connect with the server.
+
 \begin{verbatim}
         struct Client_data *needdata = (struct Client_data*) args;
         int status, client_fd;
@@ -205,6 +222,9 @@ This thread will continuously check whether the client has received all the pack
             RETURN(2);
         }
 \end{verbatim}
+
+A quick note - "RETURN" is a macro defined in the constants.h file. \\
+
 \textbf{4.2 Sending SENDLINE to Server}
 \begin{verbatim}
         while (!needdata->complete) {
@@ -213,6 +233,9 @@ This thread will continuously check whether the client has received all the pack
                 continue;
             }
 \end{verbatim}
+
+So, while the complete data is not received, we send the SENDLINE message to the server. \\
+
 \textbf{4.3 Receiving the Data from Server}
 \begin{verbatim}
     while(count < 2){
@@ -228,6 +251,9 @@ This thread will continuously check whether the client has received all the pack
         }
     }
 \end{verbatim}
+
+Here, count keeps the track of number of linebreaks that have been seen yet. While we do not get 2 linebreaks, we keep on "recv" the data from the server. This happens because the socket file can only send a fragment of the data in the buffer. Thus, we need to read it in a while loop.\\ 
+
 \textbf{4.4 Parsing the Data}
 \begin{verbatim}
     while (i < (int)mystring.size() && mystring[i] != '\n'){
@@ -248,12 +274,18 @@ This thread will continuously check whether the client has received all the pack
     }
 \end{verbatim}\\
 
+The number before the first line-break contains the line number, and the data after that is the line data. This part of code just parses the data received from the server. \\ 
+
 \textbf{5. Clientrecv.cpp}\\
-\hspace*{28px}\textbf{Logic : }
+
+\textbf{Logic:}
 \begin{itemize}
-    \item Every client will create a socket and bind it to its port. Then it will start receiving for the packets from its peer clients. When it receives the packets, it will parse the data and store it in its data array. It will also update the checkpoint array. The data which would received from the peer client would be in the form of "(line\textbackslash nnumber data)...(line\textbackslash nnumber data)".\\ For every client, we will have N sockets which will try to connect their peer clients. The port number of the socket to which it will try to connect will be the func(client id of peer). We will maintain a vector of sockets which will be used to connect to the peer clients.
-    \item As the data received from peer is of the complex form, cleintrecv will try to convert it into the form of "line\textbackslash ndata".
+    \item Every client will create a socket (unique to connect with each other client) and bind it to one of its port. Then it will start receiving for the packets from its peer clients. When it receives the packets, it will parse the data and store it in its data array. It will also update the "received" array. 
+    \item As a part of an optimization, rather than sending one line at a time, we send multiple lines at once. Thus, the data which would be received from the peer client would look like \[\mbox{"line\_number\textbackslash n line\_data\textbackslash n...line\_number\textbackslash n line\_data\textbackslash n"}\]\\ 
+    For every client, we will have N sockets which will try to connect to the peer clients. The port number of the socket to which it will try to connect will be a function of client id of peer. We will maintain a vector of sockets which will be used to communicate with the peer clients.
+    \item As the data received from peer is of the complex form, clientrecv will need to parse the data.
 \end{itemize}
+
 \textbf{Converting Data into the required form}
 \begin{verbatim}
     reading = "";
@@ -277,13 +309,22 @@ This thread will continuously check whether the client has received all the pack
         }
     }
 \end{verbatim}
-\par We are creating a string reading. We will keep on appending the data to the string reading. When we encounter two consecutive new lines, we will break the loop. It is assumed that the other peers will send the data with appending one extra $\backslash$ n at the end.\\
-We know that the underlying protocol TCP is reliable but it uses streams. Hence it could happen that data writtem in kernel socket file is not complete and received in chunks. So to assure that we had recevied all the data, we will keep writing on the client buffer until we encounter two consecutive new lines.\\
-Data is parsed in the same way as it was done in clientburst.\\
-\\
+\par We create a string reading. We keep on appending the data to the string reading until we encounter two line breaks, after which we break the loop. To indicate the end of data, we append one extra line break at the end. Thus, if two consecutive linebreaks are received, we get out of the overall loop.\\
+
+We know that the underlying protocol TCP is reliable but it uses streams. Hence it could happen that data written in kernel socket file is not complete and received in chunks. So to ensure that we have recevied all the data, we will keep writing on the client buffer until we encounter two consecutive line breaks.\\
+
+For the remaining data parsing, we do it the same way as it was done in clientburst.\\
+
 \textbf{6. Clientbroadcast.cpp}\\
-\textbf{Logic : }
-\par We have created a queue of lines which are yet to be broadcasted. Whenever we will see that the queue is empty we will record the length of queue at that time. To achieve the functionality of iterating over queue, we have implemented it using a C++ vector. We will iterate over the queue till the length we saw and create a string temp which will contain the data in the form of "line\textbackslash ndata....line\textbackslash ndata". We will then broadcast this data to all the peer clients.\\
+
+\textbf{Logic:} \\
+
+\par Initially, we had implemented a boolean array (of length L) which stored true if we had broadcasted that line, and false otherwise. (So, we had to send a line, if received[i] was true but broadcasted[i] was false). With this approach, we sent only one line at a time, and looped over the entire array to check which line to broadcast next, which takes O(L) time everytime. \\
+
+To optimize this, we created a queue of lines which are yet to be broadcasted (So, this queue contains only the line numbers which are received from the server, but not yet broadcasted i.e. Just push to the queue as soon as a line is received from the server). Whenever we will see that there is some data to broadcast (could be any number of lines), we begin to collect this data to be sent. To achieve the functionality of iterating over queue, we have implemented it using a C++ vector. One other reason to use a vector is that, we do not want to pop the data from the queue, since all the threads (each thread sending to a different client) do not work on same speed. If we pop the data, it might not be available for other threads (Recall that this struct is shared among all threads). We will iterate over the queue till the length we saw and create a string temp which will contain the data in the form of \[\mbox{"line\_number\textbackslash n line\_data\textbackslash n...line\_number\textbackslash n line\_data\textbackslash n\textbackslash n"}\]\\
+
+(Recall the two line breaks at the end of the data stream). 
+
 \begin{verbatim}
     if(data->broadcast_idx < (int)data->needed_data->broadcast.size()){
         string temp = "";
@@ -292,7 +333,6 @@ Data is parsed in the same way as it was done in clientburst.\\
             int i = data->needed_data->broadcast[data->broadcast_idx];
             data->broadcast_idx++;
             temp += (to_string(i) + "\n" + data->needed_data->data[i]);
-            // upperboundcount++;
         }
         temp += "\n";
         const char *temp1 = temp.c_str();
@@ -305,10 +345,12 @@ Data is parsed in the same way as it was done in clientburst.\\
 \end{verbatim}
 
 \textbf{7. Calculating the peer ports}
+
 \begin{itemize}
-    \item Every client will create N sockets. One socket will always be empty. All the other sockets would be to send the data to other cleints.
-    \item The ports of the sockets would be calculated as follows :$$PORTS + (needdata->clientid) * (N) + (i)$$;
-    \item Every cleint will connect to the ports : $$(PORTS + (i) * (N) + (need\_data->clientid))$$;
+    \item Every client will create N sockets for peers. One socket will always be empty. All the other sockets would be used to communicate with other clients.
+    \item The ports of the sockets would be calculated as follows: $$BASE\_PORT + (this\rightarrow clientid * N) + i;$$
+    i is the client\_id of the other client, and N is the total number of clients.
+    \item Every client will connect to the ports:  $$BASE\_PORT + (i * N) + this\rightarrow clientid;$$
     \item This will ensure that every client will connect to every other client.
 \end{itemize}
 \begin{figure}[H]
@@ -318,7 +360,7 @@ Data is parsed in the same way as it was done in clientburst.\\
     \label{fig:my_label}
 \end{figure}
 
-\par The figure show that how Client 1 and Client 2 are connected from all the other peers.\\
+\par The figure shows how Client 1 and Client 2 are connected with all other peers.\\
 
 \subsection{Fault Recovery and Consistency}
 \section{Analysis}
