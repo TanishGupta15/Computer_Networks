@@ -10,6 +10,7 @@ static const char* client_ips[N] = {"10.194.23.67", "10.194.46.195",  "10.194.18
 #define serverIP "10.17.51.115"
 // #define DEBUG // Comment this line to disable debug messages
 // #define PLOT
+// #define DEV // This is for the SESSION RESET command that will not be avaiable in final submission
 #define RETURN(x) do \
 {                                       \
     static int a = x;                     \

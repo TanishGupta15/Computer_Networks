@@ -35,7 +35,7 @@ bottom=10mm,
 \begin{center}
 \hrule
 \vspace{.4cm}
-{\textbf { \large COL334 Computer Networks SEM II 2023-24}}
+{\textbf { \large COL334 Computer Networks SEM I 2023-24}}
 \end{center}
 {
     \begin{center}
@@ -347,11 +347,11 @@ To optimize this, we created a queue of lines which are yet to be broadcasted (S
 \textbf{7. Calculating the peer ports}
 
 \begin{itemize}
-    \item Every client will create N sockets for peers. One socket will always be empty. All the other sockets would be used to communicate with other clients.
+    \item Every client will create 2*N sockets for peers. One pair of sockets will always be empty. All the other sockets would be used to communicate with other clients.
     \item The ports of the sockets would be calculated as follows: $$BASE\_PORT + (this\rightarrow clientid * N) + i;$$
     i is the client\_id of the other client, and N is the total number of clients.
     \item Every client will connect to the ports:  $$BASE\_PORT + (i * N) + this\rightarrow clientid;$$
-    \item This will ensure that every client will connect to every other client.
+    \item This will ensure that every client can connect to every other client.
 \end{itemize}
 \begin{center}
     \begin{tikzpicture}
@@ -440,17 +440,17 @@ To optimize this, we created a queue of lines which are yet to be broadcasted (S
     \item Figure shows the way in which Clients are connecting each other, Left Small circles represent Listening ports and Right Small circles represent receiving ports
     \item Every Client can calculate its reserved port by mathematical equation presented above. 
     \item It could be observed that every client would have one pair of port empty.
-    \item For the pictorial view of mathematical equation, this is what really happening. For efficient utilization of ports, we have not made sockets for port$(==)$clientid.
+    \item For efficient utilization of ports, we have not made sockets for port$(==)$clientid.
 \end{itemize}
 
-\subsection{Fault Resistent Design and Implementation}
+\subsection{Fault Resistant Design and Implementation}
 \begin{itemize}
     \item \textbf{Recovery from Suddenly Disconnected Client} : There could be situations of deadlocks, where receiving keep trying to receive data from the client which is not sending any data. To avoid this, we used the return value of recv() which 0 when peer connection breaks. In this we are assuming that the peer has broadcasted all the data it has, and now it is Disconnected. This is always the case in our design as we are using TCP which is a reliable protocol. So if a peer suddenly breaks a connection, we will also close the socket, Whenever recv returns 0.
     \item \textbf{Consistency between Data sent and received} : TCP is a stream protocol, Whenever we use send function, it just writes it in the Kernel buffer, where Kernel TCP will send it according to fragment size of underlying protocols. Due to which at receiving side, recv can give us data in chunks. To avoid this, we have used two consecutive line breaks to indicate the end of data. So we will keep on receiving data until we encounter two consecutive line breaks. This will ensure that we have received all the data sent by the peer.
-    \item \textbf{Consistency of Data} : We have used seperate ports for receving and sending for each pair of client, this will keep the data from different clients seperate. Also we have used seperate sockets for each pair of client, this will ensure that data from different clients will not mix up.
-    \item \textbf{Fault Recovery} : If any of the clients suddenly dies due to any reasons, our implementation could make connection with that cleint again. This is because we have used seperate sockets for each pair of client. So if any of the cleint dies, then also other reserved sockets would be listening for it, till they are not closed.
-    \item \textbf{Sending Data after submission} : For reducing latency overall of the system, any client who receives all the data and had submiited its file, will not complete until it broadcasts all the data it has.
-    \item \textbf{Reusing Ports} : It is possible that the port we are assigning any thread could be in a zombie state with any other process, in which case, we are calling setsockopt, which we will help in reusing such sockets, other, it would not connect with other peers.
+    \item \textbf{Consistency of Data} : We have used separate ports for receiving and sending for each pair of client, this will keep the data from different clients separate. Also we have used separate sockets for each pair of client, this will ensure that data from different clients will not mix up.
+    \item \textbf{Fault Recovery} : If any of the clients suddenly dies due to any reasons, our implementation could make connection with that client again. This is because we have used separate sockets for each pair of client. So if any of the client dies, then also other reserved sockets would be listening for it, till they are not closed.
+    \item \textbf{Sending Data after submission} : For reducing latency of the overall system, any client who receives all the data and has submitted its file, will not complete and exit until it broadcasts all the data it has.
+    \item \textbf{Reusing Ports} : It is possible that the port we are assigning any thread could be in a zombie state with any other process, in which case, we are calling setsockopt, which we will help in reusing such sockets, otherwise, it would not connect with other peers.
 \end{itemize}
 
 \section{Analysis}
@@ -519,6 +519,8 @@ As can be seen in the above graphs, the time decreases as more nodes are added. 
 
 We even tested with N clients, when only some x \((< N)\) receives the lines from the server, and others just receive lines from other clients after those x clients have received all the lines. This was done to check if memory limits are violated and the speed of P2P connections. It worked correctly, and the speed was very fast (in less than a second!). 
 
+\section{Conclusion}
 
+In this assignment, we presented a mesh network between N peers (for N = 1, 2, 3, 4) to coordinate, share and submit a file to the server. We learned about the TCP protocol and server programming in C++. Along the way, we performed various kinds of optimizations to reduce overall latency and submit the file as soon as possible.
 
 \end{document}
