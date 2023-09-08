@@ -43,6 +43,27 @@ void *clientburst(void *args){
 		RETURN(2);
 	}
 
+	int count = 0; //number of line breaks
+	const char* session_reset = "SESSION RESET\n";
+	while(send(client_fd, session_reset, strlen(session_reset), 0) < 0){
+		perror("send");
+		continue;
+	}
+	string str = "";
+	while(count < 1){
+		int x = recv(client_fd, buffer, BUFFER_SIZE, 0);
+		if(x < 0){
+			perror("recv");
+			continue;
+		}
+		for(int i = 0; i < x; i++){
+			if(buffer[i] == '\n') count++;
+			str += buffer[i];
+			if(count == 1) break;
+		}
+	}
+	assert(str == "Ok\n"); // TODO: can do something better than assert?
+
 	int cnt = 0;
 	while (!needdata->complete) {
 		if(send(client_fd, sendline, strlen(sendline), 0) < 0){
@@ -50,7 +71,6 @@ void *clientburst(void *args){
 			continue;
 		}
 
-		//TODO: Change this to while loop
 		int count = 0; //number of line breaks
 		string mystring = "";
 		while(count < 2){
@@ -129,7 +149,7 @@ void *clientburst(void *args){
 	cout << "Done sending, yay :)\n";
 
 	string reading = "";
-	int count = 0;
+	count = 0;
 	while(count < 1){
 		int x = recv(client_fd, buffer, BUFFER_SIZE, 0);
 		if(x < 0){
