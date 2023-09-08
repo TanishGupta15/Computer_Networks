@@ -1,17 +1,23 @@
 all:
-	g++ controller.cpp client.cpp clientburst.cpp clientrecv.cpp clientbroadcast.cpp driver.cpp -pthread -o client
-	./client
+	mkdir -p bin
+	mkdir -p logs
+	g++ -O3 ./controller.cpp ./client.cpp ./clientburst.cpp ./clientrecv.cpp ./clientbroadcast.cpp ./driver.cpp -pthread -o ./bin/client
+	./bin/client
 
 compile:
-	g++ controller.cpp client.cpp clientburst.cpp clientrecv.cpp clientbroadcast.cpp driver.cpp -pthread -o client
+	mkdir -p bin
+	mkdir -p logs
+	g++ ./controller.cpp ./client.cpp ./clientburst.cpp ./clientrecv.cpp ./clientbroadcast.cpp ./driver.cpp -pthread -o ./bin/client
 
 clean:
-	rm -rf client
-	rm *.txt
+	rm -rf bin/
+	rm -rf logs/
 
 run:
-	./client
+	./bin/client
 
 debug:
-	g++ -g -Wall controller.cpp client.cpp clientburst.cpp clientrecv.cpp clientbroadcast.cpp driver.cpp -pthread -o client
-	gdb client
+	mkdir -p bin
+	mkdir -p logs
+	g++ -g -Wall ./controller.cpp ./client.cpp ./clientburst.cpp ./clientrecv.cpp ./clientbroadcast.cpp ./driver.cpp -pthread -o ./bin/client
+	gdb ./bin/client

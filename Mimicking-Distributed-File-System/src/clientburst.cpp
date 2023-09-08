@@ -13,8 +13,6 @@ struct Client_data{
     bool complete;
  	int port[N];
 	const char *ips[N];
-	// bool broadcasted[L];
-	// queue<int> broadcast;
 	vector<int> broadcast;
 	int clientid;
 };

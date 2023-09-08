@@ -1,0 +1,3 @@
+threads exit properly
+Use while loop over send (needed if send < 0)
+SESSION RESET in code
