@@ -31,7 +31,7 @@ void *p2p_recv(void *args){
 	string reading = "";
 	struct P2P_connection *data = (struct P2P_connection *)args;
 	#ifdef DEBUG
-		ofstream fout("logs/recv_log_" + to_string(data->clientid) + ".txt");
+		ofstream fout("../logs/recv_log_" + to_string(data->clientid) + ".txt");
 	#endif
 	string temp1 = "ack";
 	const char *ack = temp1.c_str();

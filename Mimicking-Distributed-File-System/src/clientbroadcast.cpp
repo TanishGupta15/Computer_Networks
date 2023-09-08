@@ -31,7 +31,7 @@ struct P2P_connection{
 void *p2p_broadcast(void *args){
     struct P2P_connection* data = (struct P2P_connection*) args;
     #ifdef DEBUG
-        ofstream fout("logs/send_log_" + to_string(data->clientid) + ".txt");
+        ofstream fout("../logs/send_log_" + to_string(data->clientid) + ".txt");
     #endif
     int sock = data->socket;
     while (!data->needed_data->complete || (data->broadcast_idx < (int)data->needed_data->broadcast.size())){
