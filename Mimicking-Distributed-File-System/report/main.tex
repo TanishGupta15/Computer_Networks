@@ -353,16 +353,105 @@ To optimize this, we created a queue of lines which are yet to be broadcasted (S
     \item Every client will connect to the ports:  $$BASE\_PORT + (i * N) + this\rightarrow clientid;$$
     \item This will ensure that every client will connect to every other client.
 \end{itemize}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/Screenshot from 2023-09-05 11-44-09.png}
-    \caption{Client 1 and Client 2 Connections}
-    \label{fig:my_label}
-\end{figure}
+\begin{center}
+    \begin{tikzpicture}
+        % Draw central server
+        % \node[draw, circle, text width=1.5cm, align=center] (server) at (8, 0) {Server};
+        
+        % Draw nodes
+        
+            \node[draw, circle, align=center, minimum size = 0.4] (port1n1) at (-1.5, 3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port2n1) at (-1.5, 2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port3n1) at (-1.5, 1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port4n1) at (-1.5, 1) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port1n2) at (3.5, 3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port2n2) at (3.5, 2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port3n2) at (3.5, 1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port4n2) at (3.5, 1) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port1n3) at (-1.5, -3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port2n3) at (-1.5, -2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port3n3) at (-1.5, -1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port4n3) at (-1.5, -1) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port1n4) at (3.5, -3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port2n4) at (3.5, -2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port3n4) at (3.5, -1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (port4n4) at (3.5, -1) {};
 
-\par The figure shows how Client 1 and Client 2 are connected with all other peers.\\
 
-\subsection{Fault Recovery and Consistency}
+            \node[draw, circle, align=center, minimum size = 0.4] (rport1n1) at (-0.5, 3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport2n1) at (-0.5, 2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport3n1) at (-0.5, 1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport4n1) at (-0.5, 1) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport1n2) at (2.5, 3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport2n2) at (2.5, 2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport3n2) at (2.5, 1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport4n2) at (2.5, 1) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport1n3) at (-0.5, -3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport2n3) at (-0.5, -2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport3n3) at (-0.5, -1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport4n3) at (-0.5, -1) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport1n4) at (2.5, -3) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport2n4) at (2.5, -2.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport3n4) at (2.5, -1.5) {};
+            \node[draw, circle, align=center, minimum size = 0.4] (rport4n4) at (2.5, -1) {};
+        \node[draw, circle, text width=1.5cm, align=center] (node1) at (-3, 2) {Node 1};
+        \node[draw, circle, text width=1.5cm, align=center] (node2) at (5, 2) {Node 2};
+        \node[draw, circle, text width=1.5cm, align=center] (node3) at (-3, -2) {Node 3};
+        \node[draw, circle, text width=1.5cm, align=center] (node4) at (5, -2) {Node 4};
+        
+        % Draw communication lines
+        \draw[<-] (port2n1) -- (rport1n2);
+        \draw[<-] (port3n1) -- (rport1n3);
+        \draw[<-] (port4n1) -- (rport1n4);
+
+        \draw[<-] (port1n4) -- (rport4n1);
+        \draw[<-] (port2n4) -- (rport4n2);
+        \draw[<-] (port3n4) -- (rport4n3);
+
+        \draw[<-] (port1n3) -- (rport3n1);
+        \draw[<-] (port2n3) -- (rport3n2);
+        \draw[<-] (port4n3) -- (rport3n4);
+
+        \draw[<-] (port1n2) -- (rport2n1);
+        \draw[<-] (port3n2) -- (rport2n3);
+        \draw[<-] (port4n2) -- (rport2n4);
+        % \draw[<->] (node2) -- (server);
+        % \draw[<->] (node3) -- (server);
+        % \draw[<->] (node4) -- (server);
+        
+        % \draw[<->] (node1) -- (node2);
+        % \draw[<->] (node1) -- (node3);
+        % \draw[<->] (node1) -- (node4);
+        
+        % \draw[<->] (node2) -- (node1);
+        % \draw[<->] (node2) -- (node3);
+        % \draw[<->] (node2) -- (node4);
+        
+        % \draw[<->] (node3) -- (node1);
+        % \draw[<->] (node3) -- (node2);
+        % \draw[<->] (node3) -- (node4);
+        
+        % \draw[<->] (node4) -- (node1);
+        % \draw[<->] (node4) -- (node2);
+        % \draw[<->] (node4) -- (node3);
+    \end{tikzpicture}
+    \end{center}
+\begin{itemize}
+    \item Figure shows the way in which Clients are connecting each other, Left Small circles represent Listening ports and Right Small circles represent receiving ports
+    \item Every Client can calculate its reserved port by mathematical equation presented above. 
+    \item It could be observed that every client would have one pair of port empty.
+    \item For the pictorial view of mathematical equation, this is what really happening. For efficient utilization of ports, we have not made sockets for port$(==)$clientid.
+\end{itemize}
+
+\subsection{Fault Resistent Design and Implementation}
+\begin{itemize}
+    \item \textbf{Recovery from Suddenly Disconnected Client} : There could be situations of deadlocks, where receiving keep trying to receive data from the client which is not sending any data. To avoid this, we used the return value of recv() which 0 when peer connection breaks. In this we are assuming that the peer has broadcasted all the data it has, and now it is Disconnected. This is always the case in our design as we are using TCP which is a reliable protocol. So if a peer suddenly breaks a connection, we will also close the socket, Whenever recv returns 0.
+    \item \textbf{Consistency between Data sent and received} : TCP is a stream protocol, Whenever we use send function, it just writes it in the Kernel buffer, where Kernel TCP will send it according to fragment size of underlying protocols. Due to which at receiving side, recv can give us data in chunks. To avoid this, we have used two consecutive line breaks to indicate the end of data. So we will keep on receiving data until we encounter two consecutive line breaks. This will ensure that we have received all the data sent by the peer.
+    \item \textbf{Consistency of Data} : We have used seperate ports for receving and sending for each pair of client, this will keep the data from different clients seperate. Also we have used seperate sockets for each pair of client, this will ensure that data from different clients will not mix up.
+    \item \textbf{Fault Recovery} : If any of the clients suddenly dies due to any reasons, our implementation could make connection with that cleint again. This is because we have used seperate sockets for each pair of client. So if any of the cleint dies, then also other reserved sockets would be listening for it, till they are not closed.
+    \item \textbf{Sending Data after submission} : For reducing latency overall of the system, any client who receives all the data and had submiited its file, will not complete until it broadcasts all the data it has.
+    \item \textbf{Reusing Ports} : It is possible that the port we are assigning any thread could be in a zombie state with any other process, in which case, we are calling setsockopt, which we will help in reusing such sockets, other, it would not connect with other peers.
+\end{itemize}
 
 \section{Analysis}
 
