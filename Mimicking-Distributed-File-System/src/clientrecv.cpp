@@ -149,10 +149,10 @@ void *clientrecv(void *args){
 	while (connectionchk != N-1){
 		for (int i = 0; i < N; i++){
 			if (i != need_data->clientid && !connected[i]){
-				// cout << "Trying to connect " << serv_addrs[i].sin_port << endl;
+				cout << "Trying to connect " << serv_addrs[i].sin_port << endl;
 				if ((status = connect(receivers[i], (struct sockaddr *)&serv_addrs[i], sizeof(serv_addrs[i]))) < 0){
-					// cout << "Couldn't connect. Trying again...\n";
-					// perror("connect");
+					cout << "Couldn't connect. Trying again...\n";
+					perror("connect");
 					continue;
 				}
 				else{

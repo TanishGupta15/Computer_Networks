@@ -31,11 +31,11 @@ bottom=10mm,
 \begin{document}
 
 \onehalfspacing
-\newcommand{\current}{September 2023}
+\newcommand{\current}{June 2023}
 \begin{center}
 \hrule
 \vspace{.4cm}
-{\textbf { \large COL334 Computer Networks SEM I 2023-24}}
+{\textbf { \large COL334 Computer Networks SEM II 2023-24}}
 \end{center}
 {
     \begin{center}
@@ -363,14 +363,72 @@ To optimize this, we created a queue of lines which are yet to be broadcasted (S
 \par The figure shows how Client 1 and Client 2 are connected with all other peers.\\
 
 \subsection{Fault Recovery and Consistency}
+
 \section{Analysis}
+
+We have tested the code extensively for N = 1, 2, 3 and 4 clients. One of the important realizations that we made was that the variance in the total time taken was significant, perhaps due to the server load. On the last date of submission, the server load seemed to be too high. Nevertheless, we present time from one of the runs here for each N, and a range of values for time taken that we experienced. 
+
 \subsection{N = 1}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/latency_n_1.png}
+    \caption{Time taken when only 1 client}
+    \label{fig:my_label}
+\end{figure}
+
+As expected, initially the number of unique lines received is too high, and hence, the slope of the graph is very small. With time, the probability of receiving a unique line decreases, and hence, it takes longer to receive more unique lines. As can be seen from the graph, approx. 80\% of the lines was received in 15 seconds, and 90\% of the lines in around 25 seconds. The last 100 lines took almost 50 seconds to be received.
+
+The range of values for time taken were between 60 seconds and 80 seconds.
+
 \subsection{N = 2}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/latency_n_2.png}
+    \caption{Time taken with 2 clients}
+    \label{fig:my_label}
+\end{figure}
+
+The overall execution time for N=2 clients is around 30 seconds. This is a significant improvement over N=1. 
+
+The range of values for time taken were between 30 seconds and 35 seconds.
+
 \subsection{N = 3}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/latency_n_3.png}
+    \caption{Time taken with 3 clients}
+    \label{fig:my_label}
+\end{figure}
+
+The range of values for time taken for N = 3 were between 22 seconds and 28 seconds.
+
 \subsection{N = 4}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/latency_n_4.png}
+    \caption{Time taken with 4 clients}
+    \label{fig:my_label}
+\end{figure}
+
+The range of values for time taken for N = 4 were between 15 seconds and 22 seconds.
+
 \subsection{Relation between Number of Clients and Time}
 
+As can be seen in the above graphs, the time decreases as more nodes are added. As a part of our analysis, we also printed the number of lines for each client, that were received from the server, and those that were received from other clients. The results were nice - for N clients, as expected almost \(\frac{1000}{N}\) lines were received by each client from the server. This uniform distribution helps in good speed. \\
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/download.png}
+    \caption{Time taken vs Number of clients}
+    \label{fig:my_label}
+\end{figure}
+
+
+We even tested with N clients, when only some x \((< N)\) receives the lines from the server, and others just receive lines from other clients after those x clients have received all the lines. This was done to check if memory limits are violated and the speed of P2P connections. It worked correctly, and the speed was very fast (in less than a second!). 
 
 
 
