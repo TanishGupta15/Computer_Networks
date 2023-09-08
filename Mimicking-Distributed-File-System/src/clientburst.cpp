@@ -108,9 +108,9 @@ void *clientburst(void *args){
 		}
 	}
 
-	#ifdef DEBUG
+	// #ifdef DEBUG
 		cout << "Received: \n" << cnt << " lines from server\n" << L - cnt << " lines from other clients\n";
-	#endif
+	// #endif
 
 	const char* submit = "SUBMIT\n";
 	while(send(client_fd, submit, strlen(submit), 0) < 0){

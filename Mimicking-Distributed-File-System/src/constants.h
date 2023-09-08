@@ -7,7 +7,7 @@ static const char* client_ips[N] = {"10.194.23.67", "10.194.46.195",  "10.194.18
 // static const char* client_ips[N] = {"10.194.23.67"}; // IP of clients
 #define client_id 0 // Client id of this client
 #define submitID "cs1200397@bitmask\n" // ID used to submit the assignment
-#define serverIP "10.17.6.5"
+#define serverIP "10.17.51.115"
 // #define DEBUG // Comment this line to disable debug messages
 #define PLOT
 #define RETURN(x) do \

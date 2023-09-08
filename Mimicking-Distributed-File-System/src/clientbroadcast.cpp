@@ -40,6 +40,10 @@ void *p2p_broadcast(void *args){
                 perror("read");
                 continue;
             }
+            if(val == 0){
+                // cout << "Connection closed\n";
+                break;
+            }
             string reading = data->buffer;
             if(reading == "ack"){
                 #ifdef DEBUG
