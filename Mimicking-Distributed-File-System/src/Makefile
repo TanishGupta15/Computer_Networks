@@ -23,5 +23,5 @@ plot:
 debug:
 	mkdir -p ../bin
 	mkdir -p ../logs
-	g++ -g -Wall ./controller.cpp ./client.cpp ./clientburst.cpp ./clientrecv.cpp ./clientbroadcast.cpp ./driver.cpp -pthread -o ../bin/client
+	g++ -g -O3 -Wall ./controller.cpp ./client.cpp ./clientburst.cpp ./clientrecv.cpp ./clientbroadcast.cpp ./driver.cpp -pthread -o ../bin/client
 	gdb ../bin/client

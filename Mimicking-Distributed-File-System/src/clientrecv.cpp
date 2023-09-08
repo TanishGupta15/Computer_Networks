@@ -13,9 +13,7 @@ struct Client_data {
 	bool received[L];
 	string data[L];
 	bool complete;
-	int port[N];
-	const char *ips[N];
-	vector<int> broadcast;
+	int broadcast[L];
 	int clientid;
 };
 
@@ -24,6 +22,7 @@ struct P2P_connection {
 	int socket;
 	char *buffer;
 	int clientid;
+	int max_idx;
 };
 
 void *p2p_recv(void *args){
@@ -43,8 +42,12 @@ void *p2p_recv(void *args){
 		reading = "";
 		while(count < 2){
             int x = recv(sock, buff, BUFFER_SIZE, 0);
+			if(x == 0){
+				// cout << "Connection closed\n";
+				break;
+			}
             if(x < 0){
-                perror("recv");
+                perror("recv2");
                 continue;
             }
             for(int i = 0; i < x; i++){
@@ -85,15 +88,21 @@ void *p2p_recv(void *args){
 				if(!data->needed_data->received[line_num]){
 					data->needed_data->received[line_num] = true;
 					data->needed_data->data[line_num] = line_data;
-
 				}
 				// cout << line_num << endl;
 				#ifdef DEBUG
 					fout << "Received line_num = " << line_num << endl;
 				#endif
 			}	
-			send(data->socket, ack, strlen(ack), MSG_NOSIGNAL);
-
+			int x = send(data->socket, ack, strlen(ack), MSG_NOSIGNAL);
+			if(x < 0){
+				perror("send");
+				continue;
+			}
+			if(x == 0){
+				cout << "Connection closed\n";
+				break;
+			}
 		}
 	}
 	#ifdef DEBUG
@@ -140,10 +149,10 @@ void *clientrecv(void *args){
 	while (connectionchk != N-1){
 		for (int i = 0; i < N; i++){
 			if (i != need_data->clientid && !connected[i]){
-				cout << "Trying to connect " << serv_addrs[i].sin_port << endl;
+				// cout << "Trying to connect " << serv_addrs[i].sin_port << endl;
 				if ((status = connect(receivers[i], (struct sockaddr *)&serv_addrs[i], sizeof(serv_addrs[i]))) < 0){
-					cout << "Couldn't connect. Trying again...\n";
-					perror("connect");
+					// cout << "Couldn't connect. Trying again...\n";
+					// perror("connect");
 					continue;
 				}
 				else{

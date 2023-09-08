@@ -8,10 +8,9 @@ struct Client_data{
     bool received[L];
     string data[L];
     bool complete;
-	int port[N];
-	const char *ips[N];
-    vector<int> broadcast;
+    int broadcast[L];
     int clientid;
+    int max_idx;
 };
 
 void *controller(void *args) {
@@ -21,7 +20,9 @@ void *controller(void *args) {
     #ifdef PLOT
         ofstream fout("../logs/latency.csv");
         fout << "Number of lines received,Time\n";
-        clock_t start = clock();
+        // auto start = time(NULL);
+        // use chrono
+        auto start = std::chrono::high_resolution_clock::now();
         int last_cnt = 0;
     #endif
     while (!data->complete) {
@@ -36,9 +37,13 @@ void *controller(void *args) {
         }
         #ifdef PLOT
             if(received_cnt > last_cnt){
-                clock_t end = clock();
+                // auto end = time(NULL);
+                // use chrono
+                auto end = std::chrono::high_resolution_clock::now();
                 // report the time in milliseconds
-                double time_taken = (double(end - start) * 1000) / double(CLOCKS_PER_SEC);
+                double time_taken = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+                time_taken /= (double)1000;
+                // cout << time_taken << " ms\n";
                 fout << received_cnt << "," << time_taken << endl;
                 last_cnt = received_cnt;
             }

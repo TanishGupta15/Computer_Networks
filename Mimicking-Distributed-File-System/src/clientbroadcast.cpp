@@ -13,10 +13,9 @@ struct Client_data{
     bool received[L];
     string data[L];
     bool complete;
-    int port[N];
-    const char *ips[N];
-    vector<int> broadcast;
+    int broadcast[L];
     int clientid;
+    int max_idx;
 };
 
 struct P2P_connection{
@@ -34,7 +33,7 @@ void *p2p_broadcast(void *args){
         ofstream fout("../logs/send_log_" + to_string(data->clientid) + ".txt");
     #endif
     int sock = data->socket;
-    while (!data->needed_data->complete || (data->broadcast_idx < (int)data->needed_data->broadcast.size())){
+    while (!data->needed_data->complete || (data->broadcast_idx <= data->needed_data->max_idx)){
         if(data->sent){
             int val = recv(sock, data->buffer, BUFFER_SIZE, 0);
             if (val < 0){
@@ -50,17 +49,13 @@ void *p2p_broadcast(void *args){
             }
             else continue;
         }
-        if(data->broadcast_idx < (int)data->needed_data->broadcast.size()){
-            // int i = data->needed_data->broadcast.front();
-            // data->needed_data->broadcast.pop();
+        if(data->broadcast_idx <= data->needed_data->max_idx){
             string temp = "";
-            // int upperboundcount = 0;
-            int lengthofvector = data->needed_data->broadcast.size();
-            while(data->broadcast_idx  < lengthofvector){
+            int lengthofvector = data->needed_data->max_idx;
+            while(data->broadcast_idx  <= lengthofvector){
                 int i = data->needed_data->broadcast[data->broadcast_idx];
                 data->broadcast_idx++;
                 temp += (to_string(i) + "\n" + data->needed_data->data[i]);
-                // upperboundcount++;
             }
             temp += "\n";
             const char *temp1 = temp.c_str();

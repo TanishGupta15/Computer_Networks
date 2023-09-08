@@ -11,10 +11,9 @@ struct Client_data{
     bool received[L];
     string data[L];
     bool complete;
- 	int port[N];
-	const char *ips[N];
-	vector<int> broadcast;
+	int broadcast[L];
 	int clientid;
+	int max_idx;
 };
 
 void *clientburst(void *args){
@@ -53,7 +52,7 @@ void *clientburst(void *args){
 	while(count < 1){
 		int x = recv(client_fd, buffer, BUFFER_SIZE, 0);
 		if(x < 0){
-			perror("recv");
+			perror("recv3");
 			continue;
 		}
 		for(int i = 0; i < x; i++){
@@ -63,7 +62,6 @@ void *clientburst(void *args){
 		}
 	}
 	assert(str == "Ok\n"); // TODO: can do something better than assert?
-
 	int cnt = 0;
 	while (!needdata->complete) {
 		if(send(client_fd, sendline, strlen(sendline), 0) < 0){
@@ -76,7 +74,7 @@ void *clientburst(void *args){
 		while(count < 2){
             int x = recv(client_fd, buffer, BUFFER_SIZE, 0);
             if(x < 0){
-                perror("recv");
+                perror("recv4");
                 continue;
             }
             for(int i = 0; i < x; i++){
@@ -106,11 +104,13 @@ void *clientburst(void *args){
 			// cout << line_num << endl;
 			needdata->data[line_num] = data;
 			needdata->received[line_num] = true;
-			needdata->broadcast.push_back(line_num);
+			needdata->broadcast[++needdata->max_idx] = line_num;
 		}
 	}
 
-	// cout << "Received: \n" << cnt << " lines from server\n" << L - cnt << " lines from other clients\n";
+	#ifdef DEBUG
+		cout << "Received: \n" << cnt << " lines from server\n" << L - cnt << " lines from other clients\n";
+	#endif
 
 	const char* submit = "SUBMIT\n";
 	while(send(client_fd, submit, strlen(submit), 0) < 0){
@@ -153,7 +153,7 @@ void *clientburst(void *args){
 	while(count < 1){
 		int x = recv(client_fd, buffer, BUFFER_SIZE, 0);
 		if(x < 0){
-			perror("recv");
+			perror("recv1");
 			continue;
 		}
 		for(int i = 0; i < x; i++){

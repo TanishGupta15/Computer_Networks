@@ -22,7 +22,7 @@ def plot_graph(data_file):
         plt.legend()
         # save the plot
         plt.savefig('../plots/latency.png')
-        # plt.show()
+        plt.show()
     except Exception as e:
         print(e)
 
